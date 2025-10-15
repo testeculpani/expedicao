@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Checklist — Expedição</title>
+  <meta name="theme-color" content="#2563eb">
+  <style>
+    :root { --border:#e5e7eb; --bg:#fafafa; --text:#111827; --muted:#6b7280; --primary:#2563eb; }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:5}
+    .container{max-width:900px;margin:0 auto;padding:14px 16px}
+    h1{font-size:20px;margin:0}
+    .muted{color:var(--muted);font-size:12px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    details summary{cursor:pointer;list-style:none;padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    details summary::-webkit-details-marker{display:none}
+    .sum-title{font-weight:600}
+    .sum-right{margin-left:auto;font-size:12px;color:var(--muted)}
+    .row{display:grid;grid-template-columns:28px 1fr 110px 1fr;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
+    .row input[type='number'], .row input[type='text']{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:16px}
+    .head{display:grid;grid-template-columns:28px 1fr 110px 1fr;gap:10px;padding:8px 14px;color:var(--muted);font-size:12px;border-bottom:1px solid var(--border)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;padding:8px 14px;position:sticky;top:48px;background:#fafafa;z-index:4}
+    .btn, .file-btn{padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;font-size:16px;display:inline-block;text-decoration:none}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .badge{font-size:13px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted)}
+    .file{display:none}
+    @media (hover:hover){ .btn:hover, .file-btn:hover{background:#f4f4f5} .btn.primary:hover{opacity:.95} }
+    @media print{ header, .actions{display:none} body{background:#fff} .card{box-shadow:none} input{border:none} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Checklist — Expedição</h1>
+      <div class="muted">Arquivo único · Salvar/Carregar .json · CSV · Imprimir</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="actions">
+      <button class="btn" id="btnLimpar">Desmarcar</button>
+      <button class="btn" id="btnImprimir">Imprimir</button>
+      <button class="btn" id="btnCSV">Exportar CSV</button>
+      <button class="btn primary" id="btnSalvar">Salvar (.json)</button>
+      <input type="file" id="fileLoad" class="file" accept=".json,application/json">
+      <label for="fileLoad" class="file-btn">Carregar (.json)</label>
+      <a class="file-btn" href="index.html">Voltar para o geral</a>
+      <span class="badge" id="badgeInfo">Conferidos: 0 · Pendências: 0</span>
+    </div>
+
+    <section class="card sect" data-setor="Expedição">
+      <details open>
+        <summary><span>📦</span><span class="sum-title">Expedição</span><span class="sum-right" data-info></span></summary>
+        <div class="head"><div></div><div>Item</div><div>Qtd</div><div>Observação</div></div>
+        
+        <div class="row" data-item="FITA KRAFT (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>FITA KRAFT (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="FITA TRANSPARENTE (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>FITA TRANSPARENTE (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="FILME STRETCH (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>FILME STRETCH (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="PLASTICO BOLHA (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>PLASTICO BOLHA (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="ETIQUETE BEGE 60X50 (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>ETIQUETE BEGE 60X50 (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="ETIQUETA LARANJA 30X50 (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>ETIQUETA LARANJA 30X50 (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="ETIQUETAS CUIDADO FRAGIL (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>ETIQUETAS CUIDADO FRAGIL (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+
+        <div class="row" data-item="RIBBON PARA IMPRESSAO (ROLO)">
+          <input type="checkbox" class="chk">
+          <div>RIBBON PARA IMPRESSAO (ROLO)</div>
+          <input type="number" min="0" inputmode="numeric" placeholder="0">
+          <input type="text" placeholder="Obs.">
+        </div>
+      </details>
+    </section>
+  </main>
+
+<script>
+(function(){
+  const badge = document.getElementById("badgeInfo");
+  const btnClear = document.getElementById("btnLimpar");
+  const btnPrint = document.getElementById("btnImprimir");
+  const btnCSV = document.getElementById("btnCSV");
+  const btnSalvar = document.getElementById("btnSalvar");
+  const fileLoad = document.getElementById("fileLoad");
+  const sectors = () => Array.from(document.querySelectorAll(".sect"));
+
+  function updateCounts(){
+    let checked = 0, total = 0;
+    sectors().forEach(sec => {
+      const chks = sec.querySelectorAll(".chk");
+      total += chks.length;
+      let inside = 0;
+      chks.forEach(c => { if (c.checked) inside++; });
+      const info = sec.querySelector("[data-info]");
+      if (info) info.textContent = inside + " / " + chks.length + " conferidos";
+      checked += inside;
+    });
+    if (badge) badge.textContent = "Conferidos: " + checked + " · Pendências: " + (total - checked);
+  }
+
+  document.addEventListener("input", (e) => {
+    if (e.target && e.target.matches('.row input[type="number"]')) {
+      const row = e.target.closest('.row');
+      const chk = row ? row.querySelector('.chk') : null;
+      if (chk) {
+        const raw = (e.target.value || '').toString().trim().replace(',', '.');
+        const num = parseFloat(raw);
+        const shouldCheck = raw !== '' && !Number.isNaN(num) && num > 0;
+        chk.checked = shouldCheck;
+        chk.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+  }, { passive: true });
+
+  document.addEventListener("change", (e) => { if (e.target.classList && e.target.classList.contains("chk")) updateCounts(); }, { passive:true });
+  document.addEventListener("click", (e) => { if (e.target.classList && e.target.classList.contains("chk")) updateCounts(); }, { passive:true });
+
+  function clearAll(e){
+    if (e) e.preventDefault();
+    document.querySelectorAll(".chk").forEach(c => { c.checked = false; c.dispatchEvent(new Event("change", { bubbles:true })); });
+    document.querySelectorAll('.row input[type="number"]').forEach(i=> i.value = "");
+    document.querySelectorAll('.row input[type="text"]').forEach(i=> i.value = "");
+    updateCounts();
+  }
+  btnClear.addEventListener("click", clearAll, { passive:false });
+  btnClear.addEventListener("touchstart", clearAll, { passive:false });
+
+  function printFriendly(){
+    const content = document.querySelector("main").innerHTML;
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0';
+    iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head>
+      <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Impressão — Expedição</title>
+      <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;padding:10px}.actions{display:none}input{border:none}</style>
+    </head><body>${content}</body></html>`);
+    doc.close();
+    iframe.onload = () => {
+      try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch(e) {}
+      setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+    };
+  }
+  btnPrint.addEventListener("click", printFriendly, { passive:true });
+  btnPrint.addEventListener("touchstart", function(e){ e.preventDefault(); printFriendly(); }, { passive:false });
+
+  function captureState(){
+    const data = [];
+    sectors().forEach(sec => {
+      const setor = sec.getAttribute('data-setor');
+      const rows = Array.from(sec.querySelectorAll('.row')).map(r => {
+        const chk = r.querySelector('.chk').checked;
+        const qtd = r.querySelector('input[type="number"]').value;
+        const obs = r.querySelector('input[type="text"]').value;
+        const item = r.getAttribute('data-item') || r.querySelector('div:nth-child(2)').textContent.trim();
+        return { item, qtd, obs, ok: chk };
+      });
+      data.push({ setor, itens: rows });
+    });
+    return { criadoEm: new Date().toISOString(), data };
+  }
+
+  function download(filename, text, type='text/plain'){
+    const blob = new Blob([text], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); document.body.removeChild(a); }, 50);
+  }
+
+  btnSalvar.addEventListener('click', () => {
+    const json = JSON.stringify(captureState(), null, 2);
+    const y = new Date().toISOString().slice(0,10);
+    download(`expedicao_checklist_${y}.json`, json, 'application/json;charset=utf-8');
+  });
+
+  btnCSV.addEventListener('click', () => {
+    const st = captureState();
+    const rows = ['Setor;Item;Quantidade;OK;Observacao'];
+    st.data.forEach(s => s.itens.forEach(i => {
+      const obs = (i.obs || '').replace(/;/g, ',');
+      rows.push([s.setor, i.item, i.qtd || '', i.ok ? 'Sim' : 'Nao', obs].join(';'));
+    }));
+    const y = new Date().toISOString().slice(0,10);
+    download(`expedicao_checklist_${y}.csv`, rows.join('\n'), 'text/csv;charset=utf-8');
+  });
+
+  fileLoad.addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      if (!json || !json.data) throw new Error('Formato inválido.');
+      json.data.forEach(s => {
+        const sec = document.querySelector(`.sect[data-setor="${CSS.escape(s.setor)}"]`);
+        if (!sec) return;
+        s.itens.forEach(it => {
+          const row = Array.from(sec.querySelectorAll('.row')).find(r => (r.getAttribute('data-item')||'').trim() === (it.item||'').trim());
+          if (!row) return;
+          row.querySelector('.chk').checked = !!it.ok;
+          row.querySelector('input[type="number"]').value = it.qtd ?? '';
+          row.querySelector('input[type="text"]').value = it.obs ?? '';
+        });
+      });
+      updateCounts();
+      alert('Checklist carregado com sucesso.');
+    } catch(err){
+      alert('Não foi possível carregar o arquivo: ' + (err.message||err));
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  updateCounts();
+})();
+</script>
+</body>
+</html>
