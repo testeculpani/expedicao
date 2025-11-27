@@ -136,28 +136,6 @@
     .status-alerta { color: #f97316; font-weight: bold; }
     .status-critico { color: #dc2626; font-weight: bold; }
 
-    .item-image {
-      width: 100%;
-      max-height: 220px;
-      object-fit: contain;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-    }
-    .image-placeholder {
-      width: 100%;
-      max-height: 220px;
-      border-radius: 8px;
-      border: 1px dashed #d1d5db;
-      background: #f9fafb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #9ca3af;
-      font-size: 13px;
-      text-align: center;
-      padding: 20px;
-    }
     .detail-title {
       font-size: 14px;
       font-weight: bold;
@@ -303,15 +281,8 @@
           </table>
         </div>
 
-        <!-- Detalhes + imagem -->
+        <!-- Detalhes -->
         <div class="right-panel">
-          <div id="imagem-container">
-            <div class="image-placeholder" id="sem-imagem">
-              Nenhum item selecionado<br>ou item sem imagem.
-            </div>
-            <img id="imagem-item" class="item-image" src="" alt="" style="display:none;">
-          </div>
-
           <div id="detalhes-item" style="margin-top: 8px;">
             <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
             <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
@@ -440,9 +411,6 @@
         <label for="campo-obs">Observações</label>
         <textarea id="campo-obs" placeholder="Detalhes importantes da peça…"></textarea>
 
-        <label for="campo-imagem">Imagem do produto</label>
-        <input type="file" id="campo-imagem" accept="image/*">
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
           <button type="submit" class="btn btn-primary">Salvar item</button>
@@ -527,7 +495,6 @@
       getFirestore, collection, addDoc, onSnapshot, query, orderBy,
       doc, updateDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
     // Config do seu projeto
     const firebaseConfig = {
@@ -541,7 +508,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const colItens = collection(db, "itens_almox");
     const colMov = collection(db, "movimentacoes_almox");
@@ -578,9 +544,6 @@
     const cardAbaixoMin = document.getElementById("card-abaixo-minimo");
     const cardCriticos = document.getElementById("card-criticos");
 
-    const imgItem = document.getElementById("imagem-item");
-    const semImagem = document.getElementById("sem-imagem");
-
     const detDesc = document.getElementById("detalhe-descricao");
     const detCodigo = document.getElementById("detalhe-codigo");
     const detSetor = document.getElementById("detalhe-setor");
@@ -593,7 +556,6 @@
     const modalBackdrop = document.getElementById("modal-backdrop");
     const btnCancelarModal = document.getElementById("btn-cancelar-modal");
     const formNovoItem = document.getElementById("form-novo-item");
-    const campoImagem = document.getElementById("campo-imagem");
 
     // ELEMENTOS MOV
     const tabelaMov = document.getElementById("tabela-mov");
@@ -738,7 +700,7 @@
       cardCriticos.textContent = criticos;
     }
 
-    // Detalhes + imagem ao lado
+    // Detalhes ao lado
     function selecionarItem(item) {
       itemSelecionado = item;
       detDesc.textContent = item.descricao || "(sem descrição)";
@@ -748,16 +710,6 @@
       detEst.textContent = item.estoque ?? "-";
       detMin.textContent = item.minimo ?? "-";
       detObs.textContent = item.obs || "-";
-
-      if (item.imagemUrl) {
-        imgItem.src = item.imagemUrl;
-        imgItem.style.display = "block";
-        semImagem.style.display = "none";
-      } else {
-        imgItem.style.display = "none";
-        semImagem.style.display = "flex";
-        semImagem.textContent = "Item sem imagem cadastrada.";
-      }
     }
 
     // Listener realtime ITENS
@@ -774,7 +726,7 @@
     filtroSetor.addEventListener("change", renderTabelaItens);
     filtroCrit.addEventListener("change", renderTabelaItens);
 
-    // Salvar novo item (com upload de imagem no Storage)
+    // Salvar novo item
     formNovoItem.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -785,8 +737,7 @@
         estoque: Number(document.getElementById("campo-estoque").value || 0),
         minimo: Number(document.getElementById("campo-minimo").value || 0),
         criticidade: document.getElementById("campo-criticidade").value || "Baixa",
-        obs: document.getElementById("campo-obs").value.trim(),
-        imagemUrl: ""
+        obs: document.getElementById("campo-obs").value.trim()
       };
 
       if (!novoItem.codigo || !novoItem.descricao || !novoItem.setor) {
@@ -794,17 +745,7 @@
         return;
       }
 
-      const arquivo = campoImagem.files[0];
-
       try {
-        if (arquivo) {
-          const caminho = `itens_almox/${Date.now()}_${arquivo.name}`;
-          const storageRef = ref(storage, caminho);
-          await uploadBytes(storageRef, arquivo);
-          const url = await getDownloadURL(storageRef);
-          novoItem.imagemUrl = url;
-        }
-
         await addDoc(colItens, novoItem);
         fecharModalItem();
       } catch (err) {
