@@ -285,7 +285,7 @@
           </table>
         </div>
 
-        <!-- Detalhes -->
+        <!-- Detalhes + ações -->
         <div class="right-panel">
           <div id="detalhes-item" style="margin-top: 8px;">
             <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
@@ -297,9 +297,17 @@
             <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
           </div>
           <button
+            class="btn btn-secondary"
+            id="btn-editar-item"
+            style="margin-top:10px;width:100%;"
+            disabled
+          >
+            Editar item selecionado
+          </button>
+          <button
             class="btn btn-danger"
             id="btn-excluir-item"
-            style="margin-top:10px;width:100%;"
+            style="margin-top:6px;width:100%;"
             disabled
           >
             Excluir item selecionado
@@ -355,6 +363,7 @@
             <th>Setor</th>
             <th>Responsável</th>
             <th>Motivo</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody id="tabela-mov">
@@ -369,10 +378,10 @@
     </div>
   </div>
 
-  <!-- Modal Novo Item -->
+  <!-- Modal Novo/Editar Item -->
   <div class="modal-backdrop" id="modal-backdrop">
     <div class="modal">
-      <h2>Novo item de almoxarifado</h2>
+      <h2 id="titulo-modal-item">Novo item de almoxarifado</h2>
       <form id="form-novo-item">
         <div class="form-row">
           <div style="flex:1;">
@@ -425,7 +434,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar item</button>
+          <button type="submit" class="btn btn-primary" id="btn-salvar-item">Salvar item</button>
         </div>
       </form>
     </div>
@@ -437,9 +446,7 @@
       <h2>Nova movimentação</h2>
       <form id="form-nova-mov">
         <label for="mov-item">Item</label>
-        <select id="mov-item" required>
-          <!-- opções preenchidas via JS -->
-        </select>
+        <select id="mov-item" required></select>
 
         <div class="form-row">
           <div style="flex:1;">
@@ -566,6 +573,9 @@
     const modalBackdrop = document.getElementById("modal-backdrop");
     const btnCancelarModal = document.getElementById("btn-cancelar-modal");
     const formNovoItem = document.getElementById("form-novo-item");
+    const tituloModalItem = document.getElementById("titulo-modal-item");
+    const btnSalvarItem = document.getElementById("btn-salvar-item");
+    const btnEditarItem = document.getElementById("btn-editar-item");
     const btnExcluirItem = document.getElementById("btn-excluir-item");
 
     // MOV
@@ -591,25 +601,52 @@
     let itensCache = [];
     let itemSelecionado = null;
     let movCache = [];
+    let modoEdicaoItem = false;
 
-    // Modal Itens
-    function abrirModalItem() {
+    // ---------- MODAL ITENS ----------
+    function abrirModalItemNovo() {
+      modoEdicaoItem = false;
+      tituloModalItem.textContent = "Novo item de almoxarifado";
+      btnSalvarItem.textContent = "Salvar item";
       formNovoItem.reset();
       document.getElementById("campo-estoque").value = 0;
       document.getElementById("campo-minimo").value = 0;
       document.getElementById("campo-criticidade").value = "Baixa";
       modalBackdrop.style.display = "flex";
     }
+
+    function abrirModalItemEdicao() {
+      if (!itemSelecionado) {
+        alert("Selecione um item para editar.");
+        return;
+      }
+      modoEdicaoItem = true;
+      tituloModalItem.textContent = "Editar item de almoxarifado";
+      btnSalvarItem.textContent = "Salvar alterações";
+
+      document.getElementById("campo-codigo").value = itemSelecionado.codigo || "";
+      document.getElementById("campo-descricao").value = itemSelecionado.descricao || "";
+      document.getElementById("campo-setor").value = itemSelecionado.setor || "";
+      document.getElementById("campo-estoque").value = itemSelecionado.estoque ?? 0;
+      document.getElementById("campo-minimo").value = itemSelecionado.minimo ?? 0;
+      document.getElementById("campo-criticidade").value = itemSelecionado.criticidade || "Baixa";
+      document.getElementById("campo-obs").value = itemSelecionado.obs || "";
+
+      modalBackdrop.style.display = "flex";
+    }
+
     function fecharModalItem() {
       modalBackdrop.style.display = "none";
     }
-    btnNovoItem.addEventListener("click", abrirModalItem);
+
+    btnNovoItem.addEventListener("click", abrirModalItemNovo);
+    btnEditarItem.addEventListener("click", abrirModalItemEdicao);
     btnCancelarModal.addEventListener("click", fecharModalItem);
     modalBackdrop.addEventListener("click", (e) => {
       if (e.target === modalBackdrop) fecharModalItem();
     });
 
-    // Modal Mov
+    // ---------- MODAL MOV ----------
     function preencherSelectItensMov() {
       movItemSelect.innerHTML = "";
       if (itensCache.length === 0) {
@@ -639,16 +676,18 @@
       movTipo.value = "Entrada";
       modalBackdropMov.style.display = "flex";
     }
+
     function fecharModalMov() {
       modalBackdropMov.style.display = "none";
     }
+
     btnNovaMov.addEventListener("click", abrirModalMov);
     btnCancelarModalMov.addEventListener("click", fecharModalMov);
     modalBackdropMov.addEventListener("click", (e) => {
       if (e.target === modalBackdropMov) fecharModalMov();
     });
 
-    // Status estoque
+    // ---------- STATUS ESTOQUE ----------
     function getStatusEstoque(item) {
       const estoque = Number(item.estoque || 0);
       const minimo = Number(item.minimo || 0);
@@ -660,7 +699,7 @@
       return { texto: "OK", classe: "status-ok" };
     }
 
-    // Render itens
+    // ---------- RENDER ITENS ----------
     function renderTabelaItens() {
       const busca = (filtroBusca.value || "").toLowerCase();
       const setor = filtroSetor.value;
@@ -710,7 +749,6 @@
       cardCriticos.textContent = criticos;
     }
 
-    // Detalhes + habilitar botão excluir
     function selecionarItem(item) {
       itemSelecionado = item;
       detDesc.textContent = item.descricao || "(sem descrição)";
@@ -720,6 +758,7 @@
       detEst.textContent = item.estoque ?? "-";
       detMin.textContent = item.minimo ?? "-";
       detObs.textContent = item.obs || "-";
+      btnEditarItem.disabled = false;
       btnExcluirItem.disabled = false;
     }
 
@@ -732,6 +771,7 @@
       detEst.textContent = "-";
       detMin.textContent = "-";
       detObs.textContent = "-";
+      btnEditarItem.disabled = true;
       btnExcluirItem.disabled = true;
     }
 
@@ -749,7 +789,7 @@
     filtroSetor.addEventListener("change", renderTabelaItens);
     filtroCrit.addEventListener("change", renderTabelaItens);
 
-    // Salvar item
+    // Salvar (novo ou edição) item
     formNovoItem.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -769,7 +809,12 @@
       }
 
       try {
-        await addDoc(colItens, novoItem);
+        if (modoEdicaoItem && itemSelecionado) {
+          const refItem = doc(db, "itens_almox", itemSelecionado.id);
+          await updateDoc(refItem, novoItem);
+        } else {
+          await addDoc(colItens, novoItem);
+        }
         fecharModalItem();
       } catch (err) {
         console.error("Erro ao salvar item:", err);
@@ -777,7 +822,7 @@
       }
     });
 
-    // --------- EXCLUIR ITEM ---------
+    // Excluir item
     btnExcluirItem.addEventListener("click", async () => {
       if (!itemSelecionado) {
         alert("Nenhum item selecionado.");
@@ -787,7 +832,7 @@
       const qtdMov = movCache.filter(m => m.itemId === itemSelecionado.id).length;
       let msg = `Tem certeza que deseja excluir o item:\n\n${itemSelecionado.codigo} - ${itemSelecionado.descricao}?`;
       if (qtdMov > 0) {
-        msg += `\n\nAtenção: existem ${qtdMov} movimentaçõe(s) registradas para este item. Elas NÃO serão apagadas, apenas ficarão sem o vínculo com o estoque atual.`;
+        msg += `\n\nAtenção: existem ${qtdMov} movimentaçõe(s) registradas para este item. Elas NÃO serão apagadas.`;
       }
 
       const ok = confirm(msg);
@@ -857,12 +902,26 @@
           <td>${mov.responsavel || ""}</td>
           <td>${mov.motivo || ""}</td>
         `;
+
+        const tdAcao = document.createElement("td");
+        const btnDel = document.createElement("button");
+        btnDel.textContent = "Excluir";
+        btnDel.className = "btn btn-danger";
+        btnDel.style.fontSize = "11px";
+        btnDel.addEventListener("click", (e) => {
+          e.stopPropagation();
+          excluirMovimentacao(mov);
+        });
+        tdAcao.appendChild(btnDel);
+        tr.appendChild(tdAcao);
+
         tabelaMov.appendChild(tr);
       });
 
       cardTotalMov.textContent = total;
     }
 
+    // Listener movimentações
     const qMov = query(colMov, orderBy("dataHora", "desc"));
     onSnapshot(qMov, (snapshot) => {
       movCache = snapshot.docs.map(docSnap => ({
@@ -944,6 +1003,44 @@
         alert("Erro ao salvar movimentação. Veja o console para detalhes.");
       }
     });
+
+    // Excluir movimentação (com ajuste de estoque para Entrada/Saída)
+    async function excluirMovimentacao(mov) {
+      const item = itensCache.find(i => i.id === mov.itemId);
+      const msgBase = `Deseja excluir esta movimentação?\n\n${mov.tipo} de ${mov.quantidade} un. do item ${mov.codigo} - ${mov.descricao}`;
+      let msg = msgBase;
+
+      if (mov.tipo === "Ajuste") {
+        msg += "\n\nObs: Ajuste NÃO irá alterar o estoque atual ao excluir, para não bagunçar o histórico.";
+      } else {
+        msg += "\n\nO estoque será ajustado automaticamente ao excluir.";
+      }
+
+      const ok = confirm(msg);
+      if (!ok) return;
+
+      try {
+        if (item && mov.tipo !== "Ajuste") {
+          let novoEstoque = Number(item.estoque || 0);
+          const qtd = Number(mov.quantidade || 0);
+
+          if (mov.tipo === "Entrada") {
+            novoEstoque -= qtd; // desfaz entrada
+          } else if (mov.tipo === "Saída") {
+            novoEstoque += qtd; // desfaz saída
+          }
+
+          const itemRef = doc(db, "itens_almox", item.id);
+          await updateDoc(itemRef, { estoque: novoEstoque });
+        }
+
+        const movRef = doc(db, "movimentacoes_almox", mov.id);
+        await deleteDoc(movRef);
+      } catch (err) {
+        console.error("Erro ao excluir movimentação:", err);
+        alert("Erro ao excluir movimentação. Veja o console para detalhes.");
+      }
+    }
 
     // Início
     setView("itens");
