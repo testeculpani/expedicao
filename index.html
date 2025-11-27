@@ -2,331 +2,613 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>Expedição — Checklist</title>
-  <meta name="theme-color" content="#ffffff">
+  <title>Almoxarifado – Peças de Manutenção</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root {
-      --bg: #f6f8fb;
-      --bg-card: #ffffff;
-      --card-border: #e5e7eb;
-      --text: #0f172a;
-      --muted: #64748b;
-      --primary: #0ea5e9;
-      --primary-strong: #0284c7;
-      --ok: #16a34a;
-      --ring: #0ea5e94d;
-      --shadow: 0 12px 30px rgba(2,6,23,.08);
-      --radius: 16px;
-    }
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Noto Sans", "Helvetica Neue", Arial; background: var(--bg); color: var(--text); }
-    a, button { cursor: pointer; }
-    header { position: sticky; top: 0; z-index: 20; background: #ffffffcc; backdrop-filter: saturate(120%) blur(6px); border-bottom: 1px solid var(--card-border); }
-    .container { max-width: 1000px; margin: 0 auto; padding: 14px 18px; }
-    .brand { display:flex; align-items:center; gap:12px; }
-    .logo { width:36px; height:36px; display:grid; place-items:center; border-radius:12px; background: linear-gradient(180deg, #38bdf8, #0ea5e9); color:#ffffff; font-weight:800; box-shadow: var(--shadow); }
-    h1 { font-size: 18px; margin: 0; letter-spacing:.2px; }
-    .muted { color: var(--muted); font-size: 12px; }
-    .actions { position: static; z-index: 1; display:flex; gap:10px; flex-wrap: wrap; padding: 10px 18px; margin: 0 auto; max-width: 1000px;  }
-    .btn { appearance:none; border:1px solid var(--card-border); color:var(--text); background: #fff; padding: 10px 14px; border-radius: 12px; font-size: 15px; box-shadow: var(--shadow); outline: none; transition: transform .06s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease; }
-    .btn:hover { transform: translateY(-1px); border-color: var(--primary); box-shadow: 0 10px 24px rgba(14,165,233,.18); }
-    .btn.primary { background: linear-gradient(180deg, var(--primary), var(--primary-strong)); border-color: transparent; color:#ffffff; font-weight: 700; }
-    .btn.ghost { background: transparent; }
-    .badge { font-size: 13px; padding: 6px 10px; border:1px solid var(--card-border); border-radius: 999px; color: var(--muted); background: #ffffff; }
-    input[type="file"] { display:none; }
-    label.file-btn { display:inline-block; }
-    .card { background: var(--bg-card); border: 1px solid var(--card-border); border-radius: var(--radius); margin: 16px auto 20vh; box-shadow: var(--shadow); overflow: hidden; max-width: 1000px; }
-    .card header.card-head { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--card-border); }
-    .title { font-weight:700; }
-    .head, .row { display: grid; grid-template-columns: 44px 1fr 140px; align-items: center; gap: 12px; }
-    .head { padding: 10px 18px; color: var(--muted); font-size: 12px; border-bottom:1px solid var(--card-border); background: #fafafa; }
-    .row { padding: 12px 18px; border-bottom:1px dashed #e2e8f0; transition: background .15s ease, border-color .15s ease; background: #ffffff; }
-    .row:hover { background: #f8fafc; border-bottom-color:#e2e8f0; }
-    .item-name { font-weight: 600; line-height: 1.3; color: var(--text); }
-    .chk-wrap { position:relative; display:inline-flex; align-items:center; }
-    .chk-wrap input { position:absolute; inset:0; width:22px; height:22px; opacity:0; }
-    .chk-wrap .fake { width:22px; height:22px; border-radius:8px; background: #fff; border:1px solid var(--card-border); display:inline-grid; place-items:center; transition: all .15s ease; }
-    .chk-wrap input:checked + .fake { border-color: var(--ok); background: #dcfce7; color: #065f46; }
-    .chk-wrap input:checked + .fake::after { content: "✓"; font-weight:900; font-size: 14px; transform: translateY(-1px); }
-    .qtd-input { width: 100%; padding: 10px 12px; border-radius: 10px; border:1px solid var(--card-border); background: #ffffff; color: var(--text); outline: none; font-size: 16px; transition: box-shadow .15s ease, border-color .15s ease; }
-    .qtd-input:focus { border-color: var(--primary); box-shadow: 0 0 0 6px var(--ring); }
-    .fab { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); display:flex; gap:10px; padding:10px; background:#ffffffee; border:1px solid var(--card-border); border-radius: 16px; box-shadow: var(--shadow);  }
-    .fab .btn { box-shadow:none; }
-    @media (min-width: 840px) { .fab { display:none; } .card { margin-bottom: 28px; } }
-    @media print { header, .actions, .fab { display:none; } body { background: #fff; color:#000; } .card { box-shadow: none; border: 1px solid #ddd; } .row { border-bottom: 1px solid #ddd; } .qtd-input { border: 1px solid #ccc; } }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    header {
+      background: #0ea5e9;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .container {
+      padding: 15px;
+    }
+    .cards {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    .card {
+      background: white;
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      min-width: 160px;
+      flex: 1;
+    }
+    .card-title {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .card-value {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    .card-value.critico { color: #dc2626; }
+
+    .top-panel {
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+    }
+    .left-panel {
+      flex: 2;
+      min-width: 0;
+    }
+    .right-panel {
+      flex: 1;
+      min-width: 260px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 10px;
+    }
+
+    .filtros {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filtros input, .filtros select {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+    }
+    .btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #0ea5e9;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #e5f3fb;
+      font-size: 12px;
+      color: #374151;
+    }
+    tr:hover {
+      background: #f9fafb;
+      cursor: pointer;
+    }
+    .status-ok { color: #16a34a; font-weight: bold; }
+    .status-alerta { color: #f97316; font-weight: bold; }
+    .status-critico { color: #dc2626; font-weight: bold; }
+
+    .item-image {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    .image-placeholder {
+      width: 100%;
+      max-height: 220px;
+      border-radius: 8px;
+      border: 1px dashed #d1d5db;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: 13px;
+      text-align: center;
+      padding: 20px;
+    }
+    .detail-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 8px 0 4px;
+    }
+    .detail-line {
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+    .detail-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    .modal h2 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .modal .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .modal label {
+      font-size: 12px;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .modal input, .modal select, .modal textarea {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 8px;
+    }
+    .modal textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 5px;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    @media (max-width: 900px) {
+      .top-panel {
+        flex-direction: column;
+      }
+      .right-panel {
+        order: -1;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div class="container brand">
-      <div class="logo">EX</div>
-      <div>
-        <h1>Expedição — Checklist</h1>
-        <div class="muted">Claro · Texto preto · Mobile-first</div>
-      </div>
-    </div>
+    <h1>Almoxarifado – Peças de Manutenção</h1>
+    <nav>
+      <a href="#">Itens</a>
+      <a href="#">Movimentações</a>
+      <a href="#">Relatórios</a>
+    </nav>
   </header>
 
-  <div class="actions">
-    <button class="btn" id="btnLimpar">Desmarcar</button>
-    <button class="btn" id="btnImprimir">Imprimir</button>
-    <button class="btn" id="btnCSV">Exportar CSV</button>
-    <button class="btn" id="btnShare">WhatsApp</button>
-    <button class="btn primary" id="btnSalvar">Salvar (.json)</button>
-    <input type="file" id="fileLoad" accept=".json,application/json">
-    <label for="fileLoad" class="btn ghost">Carregar (.json)</label>
-    <span class="badge" id="badgeInfo">Conferidos: 0 · Pendências: 0</span>
-  </div>
-
-  <main class="card sect" data-setor="Expedição">
-    <header class="card-head">
-      <span class="title">Itens de Expedição</span>
-    </header>
-    <div class="head">
-      <div>OK</div><div>Item</div><div>Qtd</div>
+  <div class="container">
+    <!-- Cards resumo -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Total de Itens</div>
+        <div class="card-value" id="card-total-itens">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Abaixo do mínimo</div>
+        <div class="card-value critico" id="card-abaixo-minimo">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Itens críticos (Alta criticidade)</div>
+        <div class="card-value" id="card-criticos">0</div>
+      </div>
     </div>
-    
-        <div class="row" data-item="FITA KRAFT (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">FITA KRAFT (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
+
+    <div class="top-panel">
+      <!-- Lista de itens -->
+      <div class="left-panel">
+        <div class="filtros">
+          <input type="text" id="filtro-busca" placeholder="Buscar por código, descrição ou referência">
+          <select id="filtro-setor">
+            <option value="">Setor</option>
+            <option>Estamparia</option>
+            <option>Solda</option>
+            <option>Pintura</option>
+            <option>Montagem</option>
+            <option>Expedição</option>
+          </select>
+          <select id="filtro-criticidade">
+            <option value="">Criticidade</option>
+            <option>Alta</option>
+            <option>Média</option>
+            <option>Baixa</option>
+          </select>
+          <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
         </div>
 
-        <div class="row" data-item="FITA TRANSPARENTE (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">FITA TRANSPARENTE (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Referência</th>
+              <th>Descrição</th>
+              <th>Máquina / Aplicação</th>
+              <th>Estoque</th>
+              <th>Mínimo</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-itens">
+            <!-- Linhas adicionadas via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Detalhes + imagem -->
+      <div class="right-panel">
+        <div id="imagem-container">
+          <div class="image-placeholder" id="sem-imagem">
+            Nenhum item selecionado<br>ou item sem imagem.
           </div>
+          <img id="imagem-item" class="item-image" src="" alt="" style="display:none;">
         </div>
 
-        <div class="row" data-item="FILME STRETCH (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">FILME STRETCH (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
+        <div id="detalhes-item" style="margin-top: 8px;">
+          <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
+          <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
+          <div class="detail-line"><span class="detail-label">Referência:</span> <span id="detalhe-referencia">-</span></div>
+          <div class="detail-line"><span class="detail-label">Aplicação / Máquina:</span> <span id="detalhe-aplicacao">-</span></div>
+          <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
+          <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
+          <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
+          <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
+          <div class="detail-line"><span class="detail-label">Local físico:</span> <span id="detalhe-local">-</span></div>
+          <div class="detail-line"><span class="detail-label">Obs. técnicas:</span> <span id="detalhe-obs">-</span></div>
         </div>
-
-        <div class="row" data-item="PLASTICO BOLHA (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">PLASTICO BOLHA (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row" data-item="ETIQUETE BEGE 60X50 (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">ETIQUETE BEGE 60X50 (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row" data-item="ETIQUETA LARANJA 30X50 (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">ETIQUETA LARANJA 30X50 (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row" data-item="ETIQUETAS CUIDADO FRAGIL (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">ETIQUETAS CUIDADO FRAGIL (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
-        </div>
-
-        <div class="row" data-item="RIBBON PARA IMPRESSAO (ROLO)">
-          <label class="chk-wrap">
-            <input type="checkbox" class="chk">
-            <span class="fake"></span>
-          </label>
-          <div class="item-name">RIBBON PARA IMPRESSAO (ROLO)</div>
-          <div class="qtd">
-            <input class="qtd-input" type="number" min="0" inputmode="numeric" placeholder="0">
-          </div>
-        </div>
-  </main>
-
-  <div class="fab">
-    <button class="btn" id="fabShare">WhatsApp</button>
-    <button class="btn primary" id="fabSalvar">Salvar</button>
+      </div>
+    </div>
   </div>
 
-<script>
-(function(){
-  const badge = document.getElementById("badgeInfo");
-  const btnClear = document.getElementById("btnLimpar");
-  const btnPrint = document.getElementById("btnImprimir");
-  const btnCSV = document.getElementById("btnCSV");
-  const btnShare = document.getElementById("btnShare");
-  const btnSalvar = document.getElementById("btnSalvar");
-  const fileLoad = document.getElementById("fileLoad");
-  const fabShare = document.getElementById("fabShare");
-  const fabSalvar = document.getElementById("fabSalvar");
+  <!-- Modal Novo Item -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <h2>Novo item de almoxarifado</h2>
+      <form id="form-novo-item">
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="campo-codigo">Código interno</label>
+            <input type="text" id="campo-codigo" required>
+          </div>
+          <div style="flex:1;">
+            <label for="campo-referencia">Referência fabricante</label>
+            <input type="text" id="campo-referencia">
+          </div>
+        </div>
 
-  function rows() { return Array.from(document.querySelectorAll('.row')); }
+        <label for="campo-descricao">Descrição</label>
+        <input type="text" id="campo-descricao" required>
 
-  function updateCounts(){
-    let checked = 0, total = 0;
-    rows().forEach(r => { total++; if (r.querySelector('.chk')?.checked) checked++; });
-    if (badge) badge.textContent = "Conferidos: " + checked + " · Pendências: " + (total - checked);
-  }
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="campo-aplicacao">Aplicação / Máquina</label>
+            <input type="text" id="campo-aplicacao">
+          </div>
+          <div style="flex:1;">
+            <label for="campo-setor">Setor</label>
+            <select id="campo-setor">
+              <option value="">Selecione…</option>
+              <option>Estamparia</option>
+              <option>Solda</option>
+              <option>Pintura</option>
+              <option>Montagem</option>
+              <option>Expedição</option>
+            </select>
+          </div>
+        </div>
 
-  document.addEventListener("input", (e) => {
-    if (e.target && e.target.matches('.qtd-input')) {
-      const row = e.target.closest('.row');
-      const chk = row ? row.querySelector('.chk') : null;
-      if (chk) {
-        const raw = (e.target.value || '').toString().trim().replace(',', '.');
-        const num = parseFloat(raw);
-        const shouldCheck = raw !== '' && !Number.isNaN(num) && num > 0;
-        chk.checked = shouldCheck;
-        chk.dispatchEvent(new Event("change", { bubbles: true }));
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="campo-estoque">Estoque atual</label>
+            <input type="number" id="campo-estoque" value="0">
+          </div>
+          <div style="flex:1;">
+            <label for="campo-minimo">Estoque mínimo</label>
+            <input type="number" id="campo-minimo" value="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="campo-local">Local físico</label>
+            <input type="text" id="campo-local" placeholder="Rua, prateleira, gaveta…">
+          </div>
+          <div style="flex:1;">
+            <label for="campo-criticidade">Criticidade</label>
+            <select id="campo-criticidade">
+              <option>Baixa</option>
+              <option>Média</option>
+              <option>Alta</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="campo-obs">Observações técnicas</label>
+        <textarea id="campo-obs" placeholder="Detalhes importantes da peça…"></textarea>
+
+        <label for="campo-imagem">Imagem do produto</label>
+        <input type="file" id="campo-imagem" accept="image/*">
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase + Lógica JS -->
+  <script type="module">
+    // Imports Firebase (use a mesma versão que você já está usando nos outros apps)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+
+    // >>>>>>> TROCAR PELA SUA CONFIGURAÇÃO DO FIREBASE <<<<<<<
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const colItens = collection(db, "itens_almox");
+
+    // Elementos da página
+    const tabelaItens = document.getElementById("tabela-itens");
+    const filtroBusca = document.getElementById("filtro-busca");
+    const filtroSetor = document.getElementById("filtro-setor");
+    const filtroCrit = document.getElementById("filtro-criticidade");
+
+    const cardTotal = document.getElementById("card-total-itens");
+    const cardAbaixoMin = document.getElementById("card-abaixo-minimo");
+    const cardCriticos = document.getElementById("card-criticos");
+
+    const imgItem = document.getElementById("imagem-item");
+    const semImagem = document.getElementById("sem-imagem");
+
+    const detDesc = document.getElementById("detalhe-descricao");
+    const detCodigo = document.getElementById("detalhe-codigo");
+    const detRef = document.getElementById("detalhe-referencia");
+    const detAplic = document.getElementById("detalhe-aplicacao");
+    const detSetor = document.getElementById("detalhe-setor");
+    const detCrit = document.getElementById("detalhe-criticidade");
+    const detEst = document.getElementById("detalhe-estoque");
+    const detMin = document.getElementById("detalhe-minimo");
+    const detLocal = document.getElementById("detalhe-local");
+    const detObs = document.getElementById("detalhe-obs");
+
+    const btnNovoItem = document.getElementById("btn-novo-item");
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    const btnCancelarModal = document.getElementById("btn-cancelar-modal");
+    const formNovoItem = document.getElementById("form-novo-item");
+    const campoImagem = document.getElementById("campo-imagem");
+
+    let itensCache = [];   // itens carregados do Firestore
+    let itemSelecionado = null;
+
+    // Mostrar / esconder modal
+    function abrirModal() {
+      formNovoItem.reset();
+      modalBackdrop.style.display = "flex";
+    }
+    function fecharModal() {
+      modalBackdrop.style.display = "none";
+    }
+    btnNovoItem.addEventListener("click", abrirModal);
+    btnCancelarModal.addEventListener("click", fecharModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) fecharModal();
+    });
+
+    // Status estoque (classe + texto)
+    function getStatusEstoque(item) {
+      const estoque = Number(item.estoque || 0);
+      const minimo = Number(item.minimo || 0);
+      if (minimo <= 0) return { texto: "Sem mínimo", classe: "status-ok" };
+      if (estoque <= 0) return { texto: "Sem estoque", classe: "status-critico" };
+      if (estoque < minimo) return { texto: "Abaixo do mínimo", classe: "status-critico" };
+      if (estoque === minimo) return { texto: "No mínimo", classe: "status-alerta" };
+      if (estoque < minimo * 1.3) return { texto: "Próximo do mínimo", classe: "status-alerta" };
+      return { texto: "OK", classe: "status-ok" };
+    }
+
+    // Renderizar tabela com filtros
+    function renderTabela() {
+      const busca = (filtroBusca.value || "").toLowerCase();
+      const setor = filtroSetor.value;
+      const crit = filtroCrit.value;
+
+      tabelaItens.innerHTML = "";
+
+      let total = 0;
+      let abaixoMin = 0;
+      let criticos = 0;
+
+      itensCache.forEach((item) => {
+        let ok = true;
+
+        if (busca) {
+          const texto = (
+            (item.codigo || "") + " " +
+            (item.referencia || "") + " " +
+            (item.descricao || "")
+          ).toLowerCase();
+          if (!texto.includes(busca)) ok = false;
+        }
+        if (setor && item.setor !== setor) ok = false;
+        if (crit && item.criticidade !== crit) ok = false;
+
+        if (!ok) return;
+
+        total++;
+        const status = getStatusEstoque(item);
+        if (status.classe === "status-critico") abaixoMin++;
+        if (item.criticidade === "Alta") criticos++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.codigo || ""}</td>
+          <td>${item.referencia || ""}</td>
+          <td>${item.descricao || ""}</td>
+          <td>${item.aplicacao || ""}</td>
+          <td>${item.estoque ?? 0}</td>
+          <td>${item.minimo ?? 0}</td>
+          <td class="${status.classe}">${status.texto}</td>
+        `;
+        tr.addEventListener("click", () => selecionarItem(item));
+        tabelaItens.appendChild(tr);
+      });
+
+      cardTotal.textContent = total;
+      cardAbaixoMin.textContent = abaixoMin;
+      cardCriticos.textContent = criticos;
+    }
+
+    // Detalhes + imagem ao lado
+    function selecionarItem(item) {
+      itemSelecionado = item;
+      detDesc.textContent = item.descricao || "(sem descrição)";
+      detCodigo.textContent = item.codigo || "-";
+      detRef.textContent = item.referencia || "-";
+      detAplic.textContent = item.aplicacao || "-";
+      detSetor.textContent = item.setor || "-";
+      detCrit.textContent = item.criticidade || "-";
+      detEst.textContent = item.estoque ?? "-";
+      detMin.textContent = item.minimo ?? "-";
+      detLocal.textContent = item.local || "-";
+      detObs.textContent = item.obs || "-";
+
+      if (item.imagemUrl) {
+        imgItem.src = item.imagemUrl;
+        imgItem.style.display = "block";
+        semImagem.style.display = "none";
+      } else {
+        imgItem.style.display = "none";
+        semImagem.style.display = "flex";
+        semImagem.textContent = "Item sem imagem cadastrada.";
       }
     }
-  }, { passive: true });
 
-  document.addEventListener("change", (e) => { if (e.target && e.target.classList && e.target.classList.contains("chk")) updateCounts(); }, { passive:true });
-
-  function clearAll(e){
-    if (e) e.preventDefault();
-    rows().forEach(r => {
-      r.querySelector('.chk').checked = false;
-      r.querySelector('.qtd-input').value = "";
+    // Listener realtime do Firestore
+    const qItens = query(colItens, orderBy("descricao"));
+    onSnapshot(qItens, (snapshot) => {
+      itensCache = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderTabela();
     });
-    updateCounts();
-  }
-  btnClear.addEventListener("click", clearAll, { passive:false });
 
-  function printFriendly(){
-    const content = document.querySelector("main").innerHTML;
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0';
-    iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
-    document.body.appendChild(iframe);
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`<!DOCTYPE html><html><head>
-      <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Impressão — Expedição</title>
-      <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Noto Sans,sans-serif;padding:16px}</style>
-    </head><body>${content}</body></html>`);
-    doc.close();
-    iframe.onload = () => { try { iframe.contentWindow.focus(); iframe.contentWindow.print(); } catch(e) {} setTimeout(() => document.body.removeChild(iframe), 800); };
-  }
-  btnPrint.addEventListener("click", printFriendly, { passive:true });
+    filtroBusca.addEventListener("input", renderTabela);
+    filtroSetor.addEventListener("change", renderTabela);
+    filtroCrit.addEventListener("change", renderTabela);
 
-  function buildShareText(){
-    const now = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    const stamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    const lines = [];
-    lines.push(`Checklist — Expedição (${stamp})`);
-    rows().forEach(r => {
-      const item = (r.getAttribute('data-item') || r.querySelector('.item-name')?.textContent || '').trim();
-      const qtd = r.querySelector('.qtd-input')?.value || '';
-      const ok  = r.querySelector('.chk')?.checked;
-      if (ok || (qtd && qtd !== '0')) {
-        const badge = ok ? '✅' : '•';
-        const extra = (qtd ? `Qtd: ${qtd}` : '');
-        lines.push(`${badge} ${item}${extra ? ' — ' + extra : ''}`);
+    // Salvar novo item (com upload de imagem no Storage)
+    formNovoItem.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const novoItem = {
+        codigo: document.getElementById("campo-codigo").value.trim(),
+        referencia: document.getElementById("campo-referencia").value.trim(),
+        descricao: document.getElementById("campo-descricao").value.trim(),
+        aplicacao: document.getElementById("campo-aplicacao").value.trim(),
+        setor: document.getElementById("campo-setor").value || "",
+        estoque: Number(document.getElementById("campo-estoque").value || 0),
+        minimo: Number(document.getElementById("campo-minimo").value || 0),
+        local: document.getElementById("campo-local").value.trim(),
+        criticidade: document.getElementById("campo-criticidade").value || "Baixa",
+        obs: document.getElementById("campo-obs").value.trim(),
+        imagemUrl: ""
+      };
+
+      const arquivo = campoImagem.files[0];
+
+      try {
+        // Se tiver imagem, sobe pro Storage primeiro
+        if (arquivo) {
+          const caminho = `itens_almox/${Date.now()}_${arquivo.name}`;
+          const storageRef = ref(storage, caminho);
+          await uploadBytes(storageRef, arquivo);
+          const url = await getDownloadURL(storageRef);
+          novoItem.imagemUrl = url;
+        }
+
+        await addDoc(colItens, novoItem);
+        fecharModal();
+      } catch (err) {
+        console.error("Erro ao salvar item:", err);
+        alert("Erro ao salvar item. Veja o console para detalhes.");
       }
     });
-    return lines.join('\n');
-  }
-
-  async function shareWhatsApp(){
-    const text = buildShareText();
-    try { if (navigator.share) { await navigator.share({ text }); return; } } catch(e) {}
-    const url = 'https://wa.me/?text=' + encodeURIComponent(text);
-    const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
-    document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 80);
-  }
-  btnShare.addEventListener('click', shareWhatsApp, { passive:true });
-  fabShare.addEventListener('click', shareWhatsApp, { passive:true });
-
-  function captureState(){
-    const data = rows().map(r => {
-      const chk = r.querySelector('.chk').checked;
-      const qtd = r.querySelector('.qtd-input').value;
-      const item = r.getAttribute('data-item') || r.querySelector('.item-name').textContent.trim();
-      return { item, qtd, ok: chk };
-    });
-    return { criadoEm: new Date().toISOString(), data: [{ setor: 'Expedição', itens: data }] };
-  }
-
-  function download(filename, text, type='text/plain'){
-    const blob = new Blob([text], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(url); document.body.removeChild(a); }, 60);
-  }
-
-  function saveJSON(){ const json = JSON.stringify(captureState(), null, 2); const y = new Date().toISOString().slice(0,10); download(`expedicao_checklist_${y}.json`, json, 'application/json;charset=utf-8'); }
-  btnSalvar.addEventListener('click', saveJSON, { passive:true });
-  fabSalvar.addEventListener('click', saveJSON, { passive:true });
-
-  btnCSV.addEventListener('click', () => {
-    const st = captureState();
-    const rowsOut = ['Setor;Item;Quantidade;OK'];
-    st.data.forEach(s => s.itens.forEach(i => { rowsOut.push([s.setor, i.item, i.qtd || '', i.ok ? 'Sim' : 'Nao'].join(';')); }));
-    const y = new Date().toISOString().slice(0,10);
-    download(`expedicao_checklist_${y}.csv`, rowsOut.join('\n'), 'text/csv;charset=utf-8');
-  }, { passive:true });
-
-  fileLoad.addEventListener('change', async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    try {
-      const text = await file.text();
-      const json = JSON.parse(text);
-      const exp = (json && json.data && Array.isArray(json.data)) ? json.data.find(x => x.setor === 'Expedição') : null;
-      if (!exp) throw new Error('Arquivo não contém setor Expedição.');
-      exp.itens.forEach(it => {
-        const row = Array.from(document.querySelectorAll('.row')).find(r => (r.getAttribute('data-item')||'').trim() === (it.item||'').trim());
-        if (!row) return;
-        row.querySelector('.chk').checked = !!it.ok;
-        row.querySelector('.qtd-input').value = it.qtd ?? '';
-      });
-      updateCounts();
-      alert('Checklist carregado com sucesso.');
-    } catch(err){ alert('Não foi possível carregar o arquivo: ' + (err.message||err)); }
-    finally { e.target.value = ''; }
-  }, { passive:false });
-
-  updateCounts();
-})();
-</script>
+  </script>
 </body>
 </html>
