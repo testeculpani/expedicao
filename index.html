@@ -109,6 +109,10 @@
       background: #e5e7eb;
       color: #111827;
     }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
 
     table {
       width: 100%;
@@ -292,6 +296,14 @@
             <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
             <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
           </div>
+          <button
+            class="btn btn-danger"
+            id="btn-excluir-item"
+            style="margin-top:10px;width:100%;"
+            disabled
+          >
+            Excluir item selecionado
+          </button>
         </div>
       </div>
     </div>
@@ -489,14 +501,12 @@
 
   <!-- Firebase + Lógica JS -->
   <script type="module">
-    // Imports Firebase via CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
     import {
       getFirestore, collection, addDoc, onSnapshot, query, orderBy,
-      doc, updateDoc, serverTimestamp
+      doc, updateDoc, serverTimestamp, deleteDoc
     } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-    // Config do seu projeto
     const firebaseConfig = {
       apiKey: "AIzaSyBM3huaVIYn2bqrrzupYTQBqFnOtSY6Zr0",
       authDomain: "almoxarifado-e9992.firebaseapp.com",
@@ -512,7 +522,7 @@
     const colItens = collection(db, "itens_almox");
     const colMov = collection(db, "movimentacoes_almox");
 
-    // NAV (abas)
+    // NAV
     const navItens = document.getElementById("nav-itens");
     const navMov = document.getElementById("nav-mov");
     const navRel = document.getElementById("nav-rel");
@@ -534,7 +544,7 @@
     navMov.addEventListener("click", (e) => { e.preventDefault(); setView("mov"); });
     navRel.addEventListener("click", (e) => { e.preventDefault(); setView("rel"); });
 
-    // ELEMENTOS ITENS
+    // ITENS
     const tabelaItens = document.getElementById("tabela-itens");
     const filtroBusca = document.getElementById("filtro-busca");
     const filtroSetor = document.getElementById("filtro-setor");
@@ -556,8 +566,9 @@
     const modalBackdrop = document.getElementById("modal-backdrop");
     const btnCancelarModal = document.getElementById("btn-cancelar-modal");
     const formNovoItem = document.getElementById("form-novo-item");
+    const btnExcluirItem = document.getElementById("btn-excluir-item");
 
-    // ELEMENTOS MOV
+    // MOV
     const tabelaMov = document.getElementById("tabela-mov");
     const cardTotalMov = document.getElementById("card-total-mov");
     const movFiltroBusca = document.getElementById("mov-filtro-busca");
@@ -577,10 +588,9 @@
     const movMotivo = document.getElementById("mov-motivo");
     const movObs = document.getElementById("mov-obs");
 
-    // STATE
-    let itensCache = [];   // itens do Firestore
+    let itensCache = [];
     let itemSelecionado = null;
-    let movCache = [];     // movimentações
+    let movCache = [];
 
     // Modal Itens
     function abrirModalItem() {
@@ -599,7 +609,7 @@
       if (e.target === modalBackdrop) fecharModalItem();
     });
 
-    // Modal Movimentação
+    // Modal Mov
     function preencherSelectItensMov() {
       movItemSelect.innerHTML = "";
       if (itensCache.length === 0) {
@@ -638,7 +648,7 @@
       if (e.target === modalBackdropMov) fecharModalMov();
     });
 
-    // Status estoque (classe + texto)
+    // Status estoque
     function getStatusEstoque(item) {
       const estoque = Number(item.estoque || 0);
       const minimo = Number(item.minimo || 0);
@@ -650,7 +660,7 @@
       return { texto: "OK", classe: "status-ok" };
     }
 
-    // Render ITENS
+    // Render itens
     function renderTabelaItens() {
       const busca = (filtroBusca.value || "").toLowerCase();
       const setor = filtroSetor.value;
@@ -700,7 +710,7 @@
       cardCriticos.textContent = criticos;
     }
 
-    // Detalhes ao lado
+    // Detalhes + habilitar botão excluir
     function selecionarItem(item) {
       itemSelecionado = item;
       detDesc.textContent = item.descricao || "(sem descrição)";
@@ -710,9 +720,22 @@
       detEst.textContent = item.estoque ?? "-";
       detMin.textContent = item.minimo ?? "-";
       detObs.textContent = item.obs || "-";
+      btnExcluirItem.disabled = false;
     }
 
-    // Listener realtime ITENS
+    function limparSelecao() {
+      itemSelecionado = null;
+      detDesc.textContent = "Selecione um item…";
+      detCodigo.textContent = "-";
+      detSetor.textContent = "-";
+      detCrit.textContent = "-";
+      detEst.textContent = "-";
+      detMin.textContent = "-";
+      detObs.textContent = "-";
+      btnExcluirItem.disabled = true;
+    }
+
+    // Listener itens
     const qItens = query(colItens, orderBy("descricao"));
     onSnapshot(qItens, (snapshot) => {
       itensCache = snapshot.docs.map(docSnap => ({
@@ -726,7 +749,7 @@
     filtroSetor.addEventListener("change", renderTabelaItens);
     filtroCrit.addEventListener("change", renderTabelaItens);
 
-    // Salvar novo item
+    // Salvar item
     formNovoItem.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -754,8 +777,33 @@
       }
     });
 
-    // ---------- MOVIMENTAÇÕES ----------
+    // --------- EXCLUIR ITEM ---------
+    btnExcluirItem.addEventListener("click", async () => {
+      if (!itemSelecionado) {
+        alert("Nenhum item selecionado.");
+        return;
+      }
 
+      const qtdMov = movCache.filter(m => m.itemId === itemSelecionado.id).length;
+      let msg = `Tem certeza que deseja excluir o item:\n\n${itemSelecionado.codigo} - ${itemSelecionado.descricao}?`;
+      if (qtdMov > 0) {
+        msg += `\n\nAtenção: existem ${qtdMov} movimentaçõe(s) registradas para este item. Elas NÃO serão apagadas, apenas ficarão sem o vínculo com o estoque atual.`;
+      }
+
+      const ok = confirm(msg);
+      if (!ok) return;
+
+      try {
+        const refItem = doc(db, "itens_almox", itemSelecionado.id);
+        await deleteDoc(refItem);
+        limparSelecao();
+      } catch (err) {
+        console.error("Erro ao excluir item:", err);
+        alert("Erro ao excluir item. Veja o console para detalhes.");
+      }
+    });
+
+    // ---------- MOVIMENTAÇÕES ----------
     function formatarDataHora(ts) {
       if (!ts) return "-";
       let d;
@@ -829,7 +877,7 @@
     movFiltroSetor.addEventListener("change", renderTabelaMov);
     movFiltroMotivo.addEventListener("change", renderTabelaMov);
 
-    // Salvar nova movimentação + atualizar estoque
+    // Salvar movimentação
     formNovaMov.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -871,14 +919,12 @@
       };
 
       try {
-        // Calcula novo estoque
         let novoEstoque = Number(item.estoque || 0);
         if (tipo === "Entrada") {
           novoEstoque += qtd;
         } else if (tipo === "Saída") {
           novoEstoque -= qtd;
         } else if (tipo === "Ajuste") {
-          // interpreta quantidade como estoque final
           novoEstoque = qtd;
         }
 
@@ -899,8 +945,9 @@
       }
     });
 
-    // Começa na view de Itens
+    // Início
     setView("itens");
+    limparSelecao();
   </script>
 </body>
 </html>
