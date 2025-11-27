@@ -244,7 +244,7 @@
     <!-- Cards resumo -->
     <div class="cards">
       <div class="card">
-        <div class="card-title">Total de Itens</div>
+        <div class="card-title">Total de itens (filtrados)</div>
         <div class="card-value" id="card-total-itens">0</div>
       </div>
       <div class="card">
@@ -261,20 +261,20 @@
       <!-- Lista de itens -->
       <div class="left-panel">
         <div class="filtros">
-          <input type="text" id="filtro-busca" placeholder="Buscar por código, descrição ou referência">
+          <input type="text" id="filtro-busca" placeholder="Buscar por código ou descrição">
           <select id="filtro-setor">
             <option value="">Setor</option>
-            <option>Estamparia</option>
-            <option>Solda</option>
-            <option>Pintura</option>
-            <option>Montagem</option>
-            <option>Expedição</option>
+            <option value="CROMAGEM">CROMAGEM</option>
+            <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+            <option value="METALURGICA">METALURGICA</option>
+            <option value="ENCABAGEM">ENCABAGEM</option>
+            <option value="SERRALHEIRO">SERRALHEIRO</option>
           </select>
           <select id="filtro-criticidade">
             <option value="">Criticidade</option>
-            <option>Alta</option>
-            <option>Média</option>
-            <option>Baixa</option>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
           </select>
           <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
         </div>
@@ -283,16 +283,15 @@
           <thead>
             <tr>
               <th>Código</th>
-              <th>Referência</th>
               <th>Descrição</th>
-              <th>Máquina / Aplicação</th>
+              <th>Setor</th>
               <th>Estoque</th>
               <th>Mínimo</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="tabela-itens">
-            <!-- Linhas adicionadas via JS -->
+            <!-- Linhas via JS -->
           </tbody>
         </table>
       </div>
@@ -309,14 +308,11 @@
         <div id="detalhes-item" style="margin-top: 8px;">
           <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
           <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
-          <div class="detail-line"><span class="detail-label">Referência:</span> <span id="detalhe-referencia">-</span></div>
-          <div class="detail-line"><span class="detail-label">Aplicação / Máquina:</span> <span id="detalhe-aplicacao">-</span></div>
           <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
           <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
           <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
           <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
-          <div class="detail-line"><span class="detail-label">Local físico:</span> <span id="detalhe-local">-</span></div>
-          <div class="detail-line"><span class="detail-label">Obs. técnicas:</span> <span id="detalhe-obs">-</span></div>
+          <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
         </div>
       </div>
     </div>
@@ -332,10 +328,6 @@
             <label for="campo-codigo">Código interno</label>
             <input type="text" id="campo-codigo" required>
           </div>
-          <div style="flex:1;">
-            <label for="campo-referencia">Referência fabricante</label>
-            <input type="text" id="campo-referencia">
-          </div>
         </div>
 
         <label for="campo-descricao">Descrição</label>
@@ -343,18 +335,14 @@
 
         <div class="form-row">
           <div style="flex:1;">
-            <label for="campo-aplicacao">Aplicação / Máquina</label>
-            <input type="text" id="campo-aplicacao">
-          </div>
-          <div style="flex:1;">
             <label for="campo-setor">Setor</label>
-            <select id="campo-setor">
+            <select id="campo-setor" required>
               <option value="">Selecione…</option>
-              <option>Estamparia</option>
-              <option>Solda</option>
-              <option>Pintura</option>
-              <option>Montagem</option>
-              <option>Expedição</option>
+              <option value="CROMAGEM">CROMAGEM</option>
+              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+              <option value="METALURGICA">METALURGICA</option>
+              <option value="ENCABAGEM">ENCABAGEM</option>
+              <option value="SERRALHEIRO">SERRALHEIRO</option>
             </select>
           </div>
         </div>
@@ -372,20 +360,16 @@
 
         <div class="form-row">
           <div style="flex:1;">
-            <label for="campo-local">Local físico</label>
-            <input type="text" id="campo-local" placeholder="Rua, prateleira, gaveta…">
-          </div>
-          <div style="flex:1;">
             <label for="campo-criticidade">Criticidade</label>
             <select id="campo-criticidade">
-              <option>Baixa</option>
-              <option>Média</option>
-              <option>Alta</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
             </select>
           </div>
         </div>
 
-        <label for="campo-obs">Observações técnicas</label>
+        <label for="campo-obs">Observações</label>
         <textarea id="campo-obs" placeholder="Detalhes importantes da peça…"></textarea>
 
         <label for="campo-imagem">Imagem do produto</label>
@@ -401,19 +385,19 @@
 
   <!-- Firebase + Lógica JS -->
   <script type="module">
-    // Imports Firebase (use a mesma versão que você já está usando nos outros apps)
+    // Imports Firebase via CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
-    // >>>>>>> TROCAR PELA SUA CONFIGURAÇÃO DO FIREBASE <<<<<<<
+    // Config do seu projeto
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJETO",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
+      apiKey: "AIzaSyBM3huaVIYn2bqrrzupYTQBqFnOtSY6Zr0",
+      authDomain: "almoxarifado-e9992.firebaseapp.com",
+      projectId: "almoxarifado-e9992",
+      storageBucket: "almoxarifado-e9992.firebasestorage.app",
+      messagingSenderId: "1035781414746",
+      appId: "1:1035781414746:web:89934cb0c0ef81b9c85d63"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -437,13 +421,10 @@
 
     const detDesc = document.getElementById("detalhe-descricao");
     const detCodigo = document.getElementById("detalhe-codigo");
-    const detRef = document.getElementById("detalhe-referencia");
-    const detAplic = document.getElementById("detalhe-aplicacao");
     const detSetor = document.getElementById("detalhe-setor");
     const detCrit = document.getElementById("detalhe-criticidade");
     const detEst = document.getElementById("detalhe-estoque");
     const detMin = document.getElementById("detalhe-minimo");
-    const detLocal = document.getElementById("detalhe-local");
     const detObs = document.getElementById("detalhe-obs");
 
     const btnNovoItem = document.getElementById("btn-novo-item");
@@ -455,9 +436,13 @@
     let itensCache = [];   // itens carregados do Firestore
     let itemSelecionado = null;
 
-    // Mostrar / esconder modal
+    // Modal
     function abrirModal() {
       formNovoItem.reset();
+      // defaults
+      document.getElementById("campo-estoque").value = 0;
+      document.getElementById("campo-minimo").value = 0;
+      document.getElementById("campo-criticidade").value = "Baixa";
       modalBackdrop.style.display = "flex";
     }
     function fecharModal() {
@@ -499,7 +484,6 @@
         if (busca) {
           const texto = (
             (item.codigo || "") + " " +
-            (item.referencia || "") + " " +
             (item.descricao || "")
           ).toLowerCase();
           if (!texto.includes(busca)) ok = false;
@@ -517,9 +501,8 @@
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${item.codigo || ""}</td>
-          <td>${item.referencia || ""}</td>
           <td>${item.descricao || ""}</td>
-          <td>${item.aplicacao || ""}</td>
+          <td>${item.setor || ""}</td>
           <td>${item.estoque ?? 0}</td>
           <td>${item.minimo ?? 0}</td>
           <td class="${status.classe}">${status.texto}</td>
@@ -538,13 +521,10 @@
       itemSelecionado = item;
       detDesc.textContent = item.descricao || "(sem descrição)";
       detCodigo.textContent = item.codigo || "-";
-      detRef.textContent = item.referencia || "-";
-      detAplic.textContent = item.aplicacao || "-";
       detSetor.textContent = item.setor || "-";
       detCrit.textContent = item.criticidade || "-";
       detEst.textContent = item.estoque ?? "-";
       detMin.textContent = item.minimo ?? "-";
-      detLocal.textContent = item.local || "-";
       detObs.textContent = item.obs || "-";
 
       if (item.imagemUrl) {
@@ -578,17 +558,19 @@
 
       const novoItem = {
         codigo: document.getElementById("campo-codigo").value.trim(),
-        referencia: document.getElementById("campo-referencia").value.trim(),
         descricao: document.getElementById("campo-descricao").value.trim(),
-        aplicacao: document.getElementById("campo-aplicacao").value.trim(),
         setor: document.getElementById("campo-setor").value || "",
         estoque: Number(document.getElementById("campo-estoque").value || 0),
         minimo: Number(document.getElementById("campo-minimo").value || 0),
-        local: document.getElementById("campo-local").value.trim(),
         criticidade: document.getElementById("campo-criticidade").value || "Baixa",
         obs: document.getElementById("campo-obs").value.trim(),
         imagemUrl: ""
       };
+
+      if (!novoItem.codigo || !novoItem.descricao || !novoItem.setor) {
+        alert("Preencha código, descrição e setor.");
+        return;
+      }
 
       const arquivo = campoImagem.files[0];
 
