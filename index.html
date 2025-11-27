@@ -30,6 +30,11 @@
       margin-left: 15px;
       font-weight: bold;
       font-size: 14px;
+      opacity: 0.9;
+    }
+    nav a.active {
+      text-decoration: underline;
+      opacity: 1;
     }
     .container {
       padding: 15px;
@@ -99,6 +104,10 @@
     .btn-primary {
       background: #0ea5e9;
       color: white;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
     }
 
     table {
@@ -215,10 +224,6 @@
       gap: 8px;
       margin-top: 5px;
     }
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
 
     @media (max-width: 900px) {
       .top-panel {
@@ -234,87 +239,150 @@
   <header>
     <h1>Almoxarifado – Peças de Manutenção</h1>
     <nav>
-      <a href="#">Itens</a>
-      <a href="#">Movimentações</a>
-      <a href="#">Relatórios</a>
+      <a href="#" id="nav-itens" class="active">Itens</a>
+      <a href="#" id="nav-mov">Movimentações</a>
+      <a href="#" id="nav-rel">Relatórios</a>
     </nav>
   </header>
 
   <div class="container">
-    <!-- Cards resumo -->
-    <div class="cards">
-      <div class="card">
-        <div class="card-title">Total de itens (filtrados)</div>
-        <div class="card-value" id="card-total-itens">0</div>
+    <!-- VIEW ITENS -->
+    <div id="view-itens">
+      <!-- Cards resumo -->
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">Total de itens (filtrados)</div>
+          <div class="card-value" id="card-total-itens">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Abaixo do mínimo</div>
+          <div class="card-value critico" id="card-abaixo-minimo">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Itens críticos (Alta criticidade)</div>
+          <div class="card-value" id="card-criticos">0</div>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-title">Abaixo do mínimo</div>
-        <div class="card-value critico" id="card-abaixo-minimo">0</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Itens críticos (Alta criticidade)</div>
-        <div class="card-value" id="card-criticos">0</div>
+
+      <div class="top-panel">
+        <!-- Lista de itens -->
+        <div class="left-panel">
+          <div class="filtros">
+            <input type="text" id="filtro-busca" placeholder="Buscar por código ou descrição">
+            <select id="filtro-setor">
+              <option value="">Setor</option>
+              <option value="CROMAGEM">CROMAGEM</option>
+              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+              <option value="METALURGICA">METALURGICA</option>
+              <option value="ENCABAGEM">ENCABAGEM</option>
+              <option value="SERRALHEIRO">SERRALHEIRO</option>
+            </select>
+            <select id="filtro-criticidade">
+              <option value="">Criticidade</option>
+              <option value="Alta">Alta</option>
+              <option value="Média">Média</option>
+              <option value="Baixa">Baixa</option>
+            </select>
+            <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descrição</th>
+                <th>Setor</th>
+                <th>Estoque</th>
+                <th>Mínimo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-itens">
+              <!-- Linhas via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Detalhes + imagem -->
+        <div class="right-panel">
+          <div id="imagem-container">
+            <div class="image-placeholder" id="sem-imagem">
+              Nenhum item selecionado<br>ou item sem imagem.
+            </div>
+            <img id="imagem-item" class="item-image" src="" alt="" style="display:none;">
+          </div>
+
+          <div id="detalhes-item" style="margin-top: 8px;">
+            <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
+            <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
+            <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
+            <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
+            <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
+            <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
+            <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="top-panel">
-      <!-- Lista de itens -->
-      <div class="left-panel">
-        <div class="filtros">
-          <input type="text" id="filtro-busca" placeholder="Buscar por código ou descrição">
-          <select id="filtro-setor">
-            <option value="">Setor</option>
-            <option value="CROMAGEM">CROMAGEM</option>
-            <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-            <option value="METALURGICA">METALURGICA</option>
-            <option value="ENCABAGEM">ENCABAGEM</option>
-            <option value="SERRALHEIRO">SERRALHEIRO</option>
-          </select>
-          <select id="filtro-criticidade">
-            <option value="">Criticidade</option>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-          </select>
-          <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Descrição</th>
-              <th>Setor</th>
-              <th>Estoque</th>
-              <th>Mínimo</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tabela-itens">
-            <!-- Linhas via JS -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Detalhes + imagem -->
-      <div class="right-panel">
-        <div id="imagem-container">
-          <div class="image-placeholder" id="sem-imagem">
-            Nenhum item selecionado<br>ou item sem imagem.
-          </div>
-          <img id="imagem-item" class="item-image" src="" alt="" style="display:none;">
-        </div>
-
-        <div id="detalhes-item" style="margin-top: 8px;">
-          <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
-          <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
-          <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
-          <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
-          <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
-          <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
-          <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
+    <!-- VIEW MOVIMENTAÇÕES -->
+    <div id="view-mov" style="display:none;">
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">Movimentações (últimas filtradas)</div>
+          <div class="card-value" id="card-total-mov">0</div>
         </div>
       </div>
+
+      <div class="filtros">
+        <input type="text" id="mov-filtro-busca" placeholder="Buscar por código, descrição ou responsável">
+        <select id="mov-filtro-tipo">
+          <option value="">Tipo</option>
+          <option value="Entrada">Entrada</option>
+          <option value="Saída">Saída</option>
+          <option value="Ajuste">Ajuste</option>
+        </select>
+        <select id="mov-filtro-setor">
+          <option value="">Setor</option>
+          <option value="CROMAGEM">CROMAGEM</option>
+          <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+          <option value="METALURGICA">METALURGICA</option>
+          <option value="ENCABAGEM">ENCABAGEM</option>
+          <option value="SERRALHEIRO">SERRALHEIRO</option>
+        </select>
+        <select id="mov-filtro-motivo">
+          <option value="">Motivo</option>
+          <option value="Preventiva">Preventiva</option>
+          <option value="Corretiva">Corretiva</option>
+          <option value="Projeto">Projeto</option>
+          <option value="Inventário">Inventário</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <button class="btn btn-primary" id="btn-nova-mov">+ Nova movimentação</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Tipo</th>
+            <th>Qtd</th>
+            <th>Setor</th>
+            <th>Responsável</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-mov">
+          <!-- Linhas via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VIEW RELATÓRIOS (placeholder) -->
+    <div id="view-rel" style="display:none;">
+      <p>Relatórios em breve 😄 (podemos montar depois com base em itens e movimentações).</p>
     </div>
   </div>
 
@@ -383,11 +451,82 @@
     </div>
   </div>
 
+  <!-- Modal Nova Movimentação -->
+  <div class="modal-backdrop" id="modal-backdrop-mov">
+    <div class="modal">
+      <h2>Nova movimentação</h2>
+      <form id="form-nova-mov">
+        <label for="mov-item">Item</label>
+        <select id="mov-item" required>
+          <!-- opções preenchidas via JS -->
+        </select>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="mov-tipo">Tipo</label>
+            <select id="mov-tipo" required>
+              <option value="Entrada">Entrada</option>
+              <option value="Saída">Saída</option>
+              <option value="Ajuste">Ajuste</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label for="mov-quantidade">Quantidade</label>
+            <input type="number" id="mov-quantidade" value="1" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="mov-setor">Setor</label>
+            <select id="mov-setor">
+              <option value="">(usar do item)</option>
+              <option value="CROMAGEM">CROMAGEM</option>
+              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+              <option value="METALURGICA">METALURGICA</option>
+              <option value="ENCABAGEM">ENCABAGEM</option>
+              <option value="SERRALHEIRO">SERRALHEIRO</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label for="mov-responsavel">Responsável</label>
+            <input type="text" id="mov-responsavel" placeholder="Quem retirou / lançou">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div style="flex:1;">
+            <label for="mov-motivo">Motivo</label>
+            <select id="mov-motivo">
+              <option value="">Selecione…</option>
+              <option value="Preventiva">Preventiva</option>
+              <option value="Corretiva">Corretiva</option>
+              <option value="Projeto">Projeto</option>
+              <option value="Inventário">Inventário</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="mov-obs">Observações</label>
+        <textarea id="mov-obs" placeholder="Detalhes da movimentação…"></textarea>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancelar-modal-mov">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar movimentação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Firebase + Lógica JS -->
   <script type="module">
     // Imports Firebase via CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    import {
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy,
+      doc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
     // Config do seu projeto
@@ -405,8 +544,31 @@
     const storage = getStorage(app);
 
     const colItens = collection(db, "itens_almox");
+    const colMov = collection(db, "movimentacoes_almox");
 
-    // Elementos da página
+    // NAV (abas)
+    const navItens = document.getElementById("nav-itens");
+    const navMov = document.getElementById("nav-mov");
+    const navRel = document.getElementById("nav-rel");
+    const viewItens = document.getElementById("view-itens");
+    const viewMov = document.getElementById("view-mov");
+    const viewRel = document.getElementById("view-rel");
+
+    function setView(view) {
+      viewItens.style.display = view === "itens" ? "block" : "none";
+      viewMov.style.display = view === "mov" ? "block" : "none";
+      viewRel.style.display = view === "rel" ? "block" : "none";
+
+      navItens.classList.toggle("active", view === "itens");
+      navMov.classList.toggle("active", view === "mov");
+      navRel.classList.toggle("active", view === "rel");
+    }
+
+    navItens.addEventListener("click", (e) => { e.preventDefault(); setView("itens"); });
+    navMov.addEventListener("click", (e) => { e.preventDefault(); setView("mov"); });
+    navRel.addEventListener("click", (e) => { e.preventDefault(); setView("rel"); });
+
+    // ELEMENTOS ITENS
     const tabelaItens = document.getElementById("tabela-itens");
     const filtroBusca = document.getElementById("filtro-busca");
     const filtroSetor = document.getElementById("filtro-setor");
@@ -433,25 +595,85 @@
     const formNovoItem = document.getElementById("form-novo-item");
     const campoImagem = document.getElementById("campo-imagem");
 
-    let itensCache = [];   // itens carregados do Firestore
-    let itemSelecionado = null;
+    // ELEMENTOS MOV
+    const tabelaMov = document.getElementById("tabela-mov");
+    const cardTotalMov = document.getElementById("card-total-mov");
+    const movFiltroBusca = document.getElementById("mov-filtro-busca");
+    const movFiltroTipo = document.getElementById("mov-filtro-tipo");
+    const movFiltroSetor = document.getElementById("mov-filtro-setor");
+    const movFiltroMotivo = document.getElementById("mov-filtro-motivo");
+    const btnNovaMov = document.getElementById("btn-nova-mov");
+    const modalBackdropMov = document.getElementById("modal-backdrop-mov");
+    const btnCancelarModalMov = document.getElementById("btn-cancelar-modal-mov");
+    const formNovaMov = document.getElementById("form-nova-mov");
+    const movItemSelect = document.getElementById("mov-item");
 
-    // Modal
-    function abrirModal() {
+    const movTipo = document.getElementById("mov-tipo");
+    const movQuantidade = document.getElementById("mov-quantidade");
+    const movSetor = document.getElementById("mov-setor");
+    const movResponsavel = document.getElementById("mov-responsavel");
+    const movMotivo = document.getElementById("mov-motivo");
+    const movObs = document.getElementById("mov-obs");
+
+    // STATE
+    let itensCache = [];   // itens do Firestore
+    let itemSelecionado = null;
+    let movCache = [];     // movimentações
+
+    // Modal Itens
+    function abrirModalItem() {
       formNovoItem.reset();
-      // defaults
       document.getElementById("campo-estoque").value = 0;
       document.getElementById("campo-minimo").value = 0;
       document.getElementById("campo-criticidade").value = "Baixa";
       modalBackdrop.style.display = "flex";
     }
-    function fecharModal() {
+    function fecharModalItem() {
       modalBackdrop.style.display = "none";
     }
-    btnNovoItem.addEventListener("click", abrirModal);
-    btnCancelarModal.addEventListener("click", fecharModal);
+    btnNovoItem.addEventListener("click", abrirModalItem);
+    btnCancelarModal.addEventListener("click", fecharModalItem);
     modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) fecharModal();
+      if (e.target === modalBackdrop) fecharModalItem();
+    });
+
+    // Modal Movimentação
+    function preencherSelectItensMov() {
+      movItemSelect.innerHTML = "";
+      if (itensCache.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Nenhum item cadastrado";
+        movItemSelect.appendChild(opt);
+        return;
+      }
+      const optPadrao = document.createElement("option");
+      optPadrao.value = "";
+      optPadrao.textContent = "Selecione um item…";
+      movItemSelect.appendChild(optPadrao);
+
+      itensCache.forEach((item) => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = `${item.codigo || "S/C"} - ${item.descricao || ""}`;
+        movItemSelect.appendChild(opt);
+      });
+    }
+
+    function abrirModalMov() {
+      preencherSelectItensMov();
+      formNovaMov.reset();
+      movQuantidade.value = 1;
+      movTipo.value = "Entrada";
+      modalBackdropMov.style.display = "flex";
+    }
+    function fecharModalMov() {
+      modalBackdropMov.style.display = "none";
+    }
+    btnNovaMov.addEventListener("click", abrirModalMov);
+    btnCancelarModalMov.addEventListener("click", fecharModalMov);
+    modalBackdropMov.addEventListener("click", (e) => {
+      if (e.target === modalBackdropMov) fecharModalMov();
     });
 
     // Status estoque (classe + texto)
@@ -466,8 +688,8 @@
       return { texto: "OK", classe: "status-ok" };
     }
 
-    // Renderizar tabela com filtros
-    function renderTabela() {
+    // Render ITENS
+    function renderTabelaItens() {
       const busca = (filtroBusca.value || "").toLowerCase();
       const setor = filtroSetor.value;
       const crit = filtroCrit.value;
@@ -538,19 +760,19 @@
       }
     }
 
-    // Listener realtime do Firestore
+    // Listener realtime ITENS
     const qItens = query(colItens, orderBy("descricao"));
     onSnapshot(qItens, (snapshot) => {
-      itensCache = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      itensCache = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
       }));
-      renderTabela();
+      renderTabelaItens();
     });
 
-    filtroBusca.addEventListener("input", renderTabela);
-    filtroSetor.addEventListener("change", renderTabela);
-    filtroCrit.addEventListener("change", renderTabela);
+    filtroBusca.addEventListener("input", renderTabelaItens);
+    filtroSetor.addEventListener("change", renderTabelaItens);
+    filtroCrit.addEventListener("change", renderTabelaItens);
 
     // Salvar novo item (com upload de imagem no Storage)
     formNovoItem.addEventListener("submit", async (e) => {
@@ -575,7 +797,6 @@
       const arquivo = campoImagem.files[0];
 
       try {
-        // Se tiver imagem, sobe pro Storage primeiro
         if (arquivo) {
           const caminho = `itens_almox/${Date.now()}_${arquivo.name}`;
           const storageRef = ref(storage, caminho);
@@ -585,12 +806,160 @@
         }
 
         await addDoc(colItens, novoItem);
-        fecharModal();
+        fecharModalItem();
       } catch (err) {
         console.error("Erro ao salvar item:", err);
         alert("Erro ao salvar item. Veja o console para detalhes.");
       }
     });
+
+    // ---------- MOVIMENTAÇÕES ----------
+
+    function formatarDataHora(ts) {
+      if (!ts) return "-";
+      let d;
+      if (ts.toDate) d = ts.toDate();
+      else d = new Date(ts);
+      const dia = String(d.getDate()).padStart(2, "0");
+      const mes = String(d.getMonth() + 1).padStart(2, "0");
+      const ano = d.getFullYear();
+      const hora = String(d.getHours()).padStart(2, "0");
+      const min = String(d.getMinutes()).padStart(2, "0");
+      return `${dia}/${mes}/${ano} ${hora}:${min}`;
+    }
+
+    function renderTabelaMov() {
+      const busca = (movFiltroBusca.value || "").toLowerCase();
+      const tipo = movFiltroTipo.value;
+      const setor = movFiltroSetor.value;
+      const motivo = movFiltroMotivo.value;
+
+      tabelaMov.innerHTML = "";
+
+      let total = 0;
+
+      movCache.forEach((mov) => {
+        let ok = true;
+
+        if (busca) {
+          const texto = (
+            (mov.codigo || "") + " " +
+            (mov.descricao || "") + " " +
+            (mov.responsavel || "")
+          ).toLowerCase();
+          if (!texto.includes(busca)) ok = false;
+        }
+        if (tipo && mov.tipo !== tipo) ok = false;
+        if (setor && mov.setor !== setor) ok = false;
+        if (motivo && mov.motivo !== motivo) ok = false;
+
+        if (!ok) return;
+
+        total++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${formatarDataHora(mov.dataHora)}</td>
+          <td>${mov.codigo || ""}</td>
+          <td>${mov.descricao || ""}</td>
+          <td>${mov.tipo || ""}</td>
+          <td>${mov.quantidade ?? 0}</td>
+          <td>${mov.setor || ""}</td>
+          <td>${mov.responsavel || ""}</td>
+          <td>${mov.motivo || ""}</td>
+        `;
+        tabelaMov.appendChild(tr);
+      });
+
+      cardTotalMov.textContent = total;
+    }
+
+    const qMov = query(colMov, orderBy("dataHora", "desc"));
+    onSnapshot(qMov, (snapshot) => {
+      movCache = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderTabelaMov();
+    });
+
+    movFiltroBusca.addEventListener("input", renderTabelaMov);
+    movFiltroTipo.addEventListener("change", renderTabelaMov);
+    movFiltroSetor.addEventListener("change", renderTabelaMov);
+    movFiltroMotivo.addEventListener("change", renderTabelaMov);
+
+    // Salvar nova movimentação + atualizar estoque
+    formNovaMov.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const itemId = movItemSelect.value;
+      if (!itemId) {
+        alert("Selecione um item.");
+        return;
+      }
+
+      const item = itensCache.find(i => i.id === itemId);
+      if (!item) {
+        alert("Item não encontrado.");
+        return;
+      }
+
+      const tipo = movTipo.value;
+      const qtd = Number(movQuantidade.value || 0);
+      if (qtd < 0) {
+        alert("Quantidade inválida.");
+        return;
+      }
+
+      const movSetorVal = movSetor.value || item.setor || "";
+      const responsavel = movResponsavel.value.trim();
+      const motivo = movMotivo.value || "";
+      const obs = movObs.value.trim();
+
+      const movDoc = {
+        itemId: itemId,
+        codigo: item.codigo || "",
+        descricao: item.descricao || "",
+        setor: movSetorVal,
+        tipo: tipo,
+        quantidade: qtd,
+        responsavel: responsavel,
+        motivo: motivo,
+        obs: obs,
+        dataHora: serverTimestamp()
+      };
+
+      try {
+        // Calcula novo estoque
+        let novoEstoque = Number(item.estoque || 0);
+        if (tipo === "Entrada") {
+          novoEstoque += qtd;
+        } else if (tipo === "Saída") {
+          novoEstoque -= qtd;
+        } else if (tipo === "Ajuste") {
+          // interpreta quantidade como estoque final
+          novoEstoque = qtd;
+        }
+
+        if (novoEstoque < 0 && tipo !== "Ajuste") {
+          const cont = confirm("Estoque ficaria negativo. Deseja continuar mesmo assim?");
+          if (!cont) return;
+        }
+
+        const itemRef = doc(db, "itens_almox", itemId);
+        await updateDoc(itemRef, { estoque: novoEstoque });
+
+        await addDoc(colMov, movDoc);
+
+        fecharModalMov();
+      } catch (err) {
+        console.error("Erro ao salvar movimentação:", err);
+        alert("Erro ao salvar movimentação. Veja o console para detalhes.");
+      }
+    });
+
+    // Começa na view de Itens
+    setView("itens");
   </script>
 </body>
 </html>
