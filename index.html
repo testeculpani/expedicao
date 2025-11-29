@@ -224,7 +224,6 @@
       <a href="#" id="nav-itens" class="active">Itens</a>
       <a href="#" id="nav-mov">Movimentações</a>
       <a href="#" id="nav-rel">Relatórios</a>
-      <!-- NOVO BOTÃO: abre página externa de relatórios -->
       <a href="relatorios.html" id="nav-rel-page">Página de Relatórios</a>
     </nav>
   </header>
@@ -261,12 +260,7 @@
               <option value="ENCABAGEM">ENCABAGEM</option>
               <option value="SERRALHEIRO">SERRALHEIRO</option>
             </select>
-            <select id="filtro-criticidade">
-              <option value="">Criticidade</option>
-              <option value="Alta">Alta</option>
-              <option value="Média">Média</option>
-              <option value="Baixa">Baixa</option>
-            </select>
+            <!-- filtro de criticidade REMOVIDO -->
             <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
           </div>
 
@@ -388,7 +382,8 @@
         <div class="form-row">
           <div style="flex:1;">
             <label for="campo-codigo">Código interno</label>
-            <input type="text" id="campo-codigo" required>
+            <!-- agora o código é só leitura e não obrigatório -->
+            <input type="text" id="campo-codigo" readonly placeholder="Gerado automaticamente">
           </div>
         </div>
 
@@ -557,7 +552,6 @@
     const tabelaItens = document.getElementById("tabela-itens");
     const filtroBusca = document.getElementById("filtro-busca");
     const filtroSetor = document.getElementById("filtro-setor");
-    const filtroCrit = document.getElementById("filtro-criticidade");
 
     const cardTotal = document.getElementById("card-total-itens");
     const cardAbaixoMin = document.getElementById("card-abaixo-minimo");
@@ -614,6 +608,7 @@
       document.getElementById("campo-estoque").value = 0;
       document.getElementById("campo-minimo").value = 0;
       document.getElementById("campo-criticidade").value = "Baixa";
+      document.getElementById("campo-codigo").value = ""; // será gerado ao salvar
       modalBackdrop.style.display = "flex";
     }
 
@@ -705,7 +700,6 @@
     function renderTabelaItens() {
       const busca = (filtroBusca.value || "").toLowerCase();
       const setor = filtroSetor.value;
-      const crit = filtroCrit.value;
 
       tabelaItens.innerHTML = "";
 
@@ -724,7 +718,6 @@
           if (!texto.includes(busca)) ok = false;
         }
         if (setor && item.setor !== setor) ok = false;
-        if (crit && item.criticidade !== crit) ok = false;
 
         if (!ok) return;
 
@@ -789,26 +782,47 @@
 
     filtroBusca.addEventListener("input", renderTabelaItens);
     filtroSetor.addEventListener("change", renderTabelaItens);
-    filtroCrit.addEventListener("change", renderTabelaItens);
+
+    // ---------- GERAR CÓDIGO AUTOMÁTICO ----------
+    function gerarCodigoSequencial() {
+      if (itensCache.length === 0) {
+        return "0001";
+      }
+      const numeros = itensCache
+        .map(i => parseInt(String(i.codigo).replace(/\D/g, ""), 10))
+        .filter(n => !isNaN(n));
+      const maxAtual = numeros.length > 0 ? Math.max(...numeros) : 0;
+      const proximo = maxAtual + 1;
+      return String(proximo).padStart(4, "0"); // 0001, 0002, 0003...
+    }
 
     // Salvar (novo ou edição) item
     formNovoItem.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      let codigo = document.getElementById("campo-codigo").value.trim();
+      const descricao = document.getElementById("campo-descricao").value.trim();
+      const setor = document.getElementById("campo-setor").value || "";
+
+      if (!descricao || !setor) {
+        alert("Preencha descrição e setor.");
+        return;
+      }
+
+      // Se não tiver código (novo item), gera automático
+      if (!modoEdicaoItem || !codigo) {
+        codigo = gerarCodigoSequencial();
+      }
+
       const novoItem = {
-        codigo: document.getElementById("campo-codigo").value.trim(),
-        descricao: document.getElementById("campo-descricao").value.trim(),
-        setor: document.getElementById("campo-setor").value || "",
+        codigo: codigo,
+        descricao: descricao,
+        setor: setor,
         estoque: Number(document.getElementById("campo-estoque").value || 0),
         minimo: Number(document.getElementById("campo-minimo").value || 0),
         criticidade: document.getElementById("campo-criticidade").value || "Baixa",
         obs: document.getElementById("campo-obs").value.trim()
       };
-
-      if (!novoItem.codigo || !novoItem.descricao || !novoItem.setor) {
-        alert("Preencha código, descrição e setor.");
-        return;
-      }
 
       try {
         if (modoEdicaoItem && itemSelecionado) {
