@@ -260,7 +260,6 @@
               <option value="ENCABAGEM">ENCABAGEM</option>
               <option value="SERRALHEIRO">SERRALHEIRO</option>
             </select>
-            <!-- filtro de criticidade REMOVIDO -->
             <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
           </div>
 
@@ -382,7 +381,6 @@
         <div class="form-row">
           <div style="flex:1;">
             <label for="campo-codigo">Código interno</label>
-            <!-- agora o código é só leitura e não obrigatório -->
             <input type="text" id="campo-codigo" readonly placeholder="Gerado automaticamente">
           </div>
         </div>
@@ -442,8 +440,9 @@
     <div class="modal">
       <h2>Nova movimentação</h2>
       <form id="form-nova-mov">
-        <label for="mov-item">Item</label>
-        <select id="mov-item" required></select>
+        <label for="mov-item-busca">Item</label>
+        <input type="text" id="mov-item-busca" placeholder="Digite código ou parte da descrição e escolha na lista" list="lista-itens" required>
+        <datalist id="lista-itens"></datalist>
 
         <div class="form-row">
           <div style="flex:1;">
@@ -585,7 +584,8 @@
     const modalBackdropMov = document.getElementById("modal-backdrop-mov");
     const btnCancelarModalMov = document.getElementById("btn-cancelar-modal-mov");
     const formNovaMov = document.getElementById("form-nova-mov");
-    const movItemSelect = document.getElementById("mov-item");
+    const movItemBusca = document.getElementById("mov-item-busca");
+    const listaItens = document.getElementById("lista-itens");
 
     const movTipo = document.getElementById("mov-tipo");
     const movQuantidade = document.getElementById("mov-quantidade");
@@ -608,7 +608,7 @@
       document.getElementById("campo-estoque").value = 0;
       document.getElementById("campo-minimo").value = 0;
       document.getElementById("campo-criticidade").value = "Baixa";
-      document.getElementById("campo-codigo").value = ""; // será gerado ao salvar
+      document.getElementById("campo-codigo").value = "";
       modalBackdrop.style.display = "flex";
     }
 
@@ -644,33 +644,22 @@
     });
 
     // ---------- MODAL MOV ----------
-    function preencherSelectItensMov() {
-      movItemSelect.innerHTML = "";
-      if (itensCache.length === 0) {
-        const opt = document.createElement("option");
-        opt.value = "";
-        opt.textContent = "Nenhum item cadastrado";
-        movItemSelect.appendChild(opt);
-        return;
-      }
-      const optPadrao = document.createElement("option");
-      optPadrao.value = "";
-      optPadrao.textContent = "Selecione um item…";
-      movItemSelect.appendChild(optPadrao);
+    function preencherDatalistItens() {
+      listaItens.innerHTML = "";
+      if (itensCache.length === 0) return;
 
       itensCache.forEach((item) => {
         const opt = document.createElement("option");
-        opt.value = item.id;
-        opt.textContent = `${item.codigo || "S/C"} - ${item.descricao || ""}`;
-        movItemSelect.appendChild(opt);
+        opt.value = `${item.codigo || "S/C"} - ${item.descricao || ""}`;
+        listaItens.appendChild(opt);
       });
     }
 
     function abrirModalMov() {
-      preencherSelectItensMov();
       formNovaMov.reset();
       movQuantidade.value = 1;
       movTipo.value = "Entrada";
+      preencherDatalistItens();
       modalBackdropMov.style.display = "flex";
     }
 
@@ -778,6 +767,7 @@
         ...docSnap.data()
       }));
       renderTabelaItens();
+      preencherDatalistItens();
     });
 
     filtroBusca.addEventListener("input", renderTabelaItens);
@@ -789,11 +779,11 @@
         return "0001";
       }
       const numeros = itensCache
-        .map(i => parseInt(String(i.codigo).replace(/\D/g, ""), 10))
+        .map(i => parseInt(String(i.codigo || "").replace(/\D/g, ""), 10))
         .filter(n => !isNaN(n));
       const maxAtual = numeros.length > 0 ? Math.max(...numeros) : 0;
       const proximo = maxAtual + 1;
-      return String(proximo).padStart(4, "0"); // 0001, 0002, 0003...
+      return String(proximo).padStart(4, "0"); // 0001, 0002...
     }
 
     // Salvar (novo ou edição) item
@@ -809,7 +799,6 @@
         return;
       }
 
-      // Se não tiver código (novo item), gera automático
       if (!modoEdicaoItem || !codigo) {
         codigo = gerarCodigoSequencial();
       }
@@ -956,17 +945,19 @@
     formNovaMov.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const itemId = movItemSelect.value;
-      if (!itemId) {
-        alert("Selecione um item.");
+      const textoItem = movItemBusca.value.trim();
+      if (!textoItem) {
+        alert("Selecione um item na lista.");
         return;
       }
 
-      const item = itensCache.find(i => i.id === itemId);
+      const item = itensCache.find(i => `${i.codigo || "S/C"} - ${i.descricao || ""}` === textoItem);
       if (!item) {
-        alert("Item não encontrado.");
+        alert("Item não encontrado. Escolha um dos itens sugeridos na lista.");
         return;
       }
+
+      const itemId = item.id;
 
       const tipo = movTipo.value;
       const qtd = Number(movQuantidade.value || 0);
@@ -1041,9 +1032,9 @@
           const qtd = Number(mov.quantidade || 0);
 
           if (mov.tipo === "Entrada") {
-            novoEstoque -= qtd; // desfaz entrada
+            novoEstoque -= qtd;
           } else if (mov.tipo === "Saída") {
-            novoEstoque += qtd; // desfaz saída
+            novoEstoque += qtd;
           }
 
           const itemRef = doc(db, "itens_almox", item.id);
