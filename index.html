@@ -266,8 +266,7 @@
           <table>
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Descrição</th>
+                <th>Item (código - descrição)</th>
                 <th>Setor</th>
                 <th>Estoque</th>
                 <th>Mínimo</th>
@@ -284,7 +283,6 @@
         <div class="right-panel">
           <div id="detalhes-item" style="margin-top: 8px;">
             <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
-            <div class="detail-line"><span class="detail-label">Código:</span> <span id="detalhe-codigo">-</span></div>
             <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
             <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
             <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
@@ -351,8 +349,7 @@
         <thead>
           <tr>
             <th>Data/Hora</th>
-            <th>Código</th>
-            <th>Descrição</th>
+            <th>Item (código - descrição)</th>
             <th>Tipo</th>
             <th>Qtd</th>
             <th>Setor</th>
@@ -378,13 +375,6 @@
     <div class="modal">
       <h2 id="titulo-modal-item">Novo item de almoxarifado</h2>
       <form id="form-novo-item">
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="campo-codigo">Código interno</label>
-            <input type="text" id="campo-codigo" readonly placeholder="Gerado automaticamente">
-          </div>
-        </div>
-
         <label for="campo-descricao">Descrição</label>
         <input type="text" id="campo-descricao" required>
 
@@ -557,7 +547,6 @@
     const cardCriticos = document.getElementById("card-criticos");
 
     const detDesc = document.getElementById("detalhe-descricao");
-    const detCodigo = document.getElementById("detalhe-codigo");
     const detSetor = document.getElementById("detalhe-setor");
     const detCrit = document.getElementById("detalhe-criticidade");
     const detEst = document.getElementById("detalhe-estoque");
@@ -608,7 +597,6 @@
       document.getElementById("campo-estoque").value = 0;
       document.getElementById("campo-minimo").value = 0;
       document.getElementById("campo-criticidade").value = "Baixa";
-      document.getElementById("campo-codigo").value = "";
       modalBackdrop.style.display = "flex";
     }
 
@@ -621,7 +609,6 @@
       tituloModalItem.textContent = "Editar item de almoxarifado";
       btnSalvarItem.textContent = "Salvar alterações";
 
-      document.getElementById("campo-codigo").value = itemSelecionado.codigo || "";
       document.getElementById("campo-descricao").value = itemSelecionado.descricao || "";
       document.getElementById("campo-setor").value = itemSelecionado.setor || "";
       document.getElementById("campo-estoque").value = itemSelecionado.estoque ?? 0;
@@ -717,8 +704,7 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${item.codigo || ""}</td>
-          <td>${item.descricao || ""}</td>
+          <td>${item.codigo ? item.codigo + " - " : ""}${item.descricao || ""}</td>
           <td>${item.setor || ""}</td>
           <td>${item.estoque ?? 0}</td>
           <td>${item.minimo ?? 0}</td>
@@ -735,8 +721,9 @@
 
     function selecionarItem(item) {
       itemSelecionado = item;
-      detDesc.textContent = item.descricao || "(sem descrição)";
-      detCodigo.textContent = item.codigo || "-";
+      detDesc.textContent =
+        (item.codigo ? item.codigo + " - " : "") +
+        (item.descricao || "(sem descrição)");
       detSetor.textContent = item.setor || "-";
       detCrit.textContent = item.criticidade || "-";
       detEst.textContent = item.estoque ?? "-";
@@ -749,7 +736,6 @@
     function limparSelecao() {
       itemSelecionado = null;
       detDesc.textContent = "Selecione um item…";
-      detCodigo.textContent = "-";
       detSetor.textContent = "-";
       detCrit.textContent = "-";
       detEst.textContent = "-";
@@ -790,7 +776,6 @@
     formNovoItem.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      let codigo = document.getElementById("campo-codigo").value.trim();
       const descricao = document.getElementById("campo-descricao").value.trim();
       const setor = document.getElementById("campo-setor").value || "";
 
@@ -799,7 +784,10 @@
         return;
       }
 
-      if (!modoEdicaoItem || !codigo) {
+      let codigo;
+      if (modoEdicaoItem && itemSelecionado) {
+        codigo = itemSelecionado.codigo || gerarCodigoSequencial();
+      } else {
         codigo = gerarCodigoSequencial();
       }
 
@@ -835,7 +823,10 @@
       }
 
       const qtdMov = movCache.filter(m => m.itemId === itemSelecionado.id).length;
-      let msg = `Tem certeza que deseja excluir o item:\n\n${itemSelecionado.codigo} - ${itemSelecionado.descricao}?`;
+      let msg = `Tem certeza que deseja excluir o item:\n\n${
+        (itemSelecionado.codigo ? itemSelecionado.codigo + " - " : "") +
+        (itemSelecionado.descricao || "")
+      }?`;
       if (qtdMov > 0) {
         msg += `\n\nAtenção: existem ${qtdMov} movimentaçõe(s) registradas para este item. Elas NÃO serão apagadas.`;
       }
@@ -899,8 +890,7 @@
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${formatarDataHora(mov.dataHora)}</td>
-          <td>${mov.codigo || ""}</td>
-          <td>${mov.descricao || ""}</td>
+          <td>${mov.codigo ? mov.codigo + " - " : ""}${mov.descricao || ""}</td>
           <td>${mov.tipo || ""}</td>
           <td>${mov.quantidade ?? 0}</td>
           <td>${mov.setor || ""}</td>
@@ -951,7 +941,9 @@
         return;
       }
 
-      const item = itensCache.find(i => `${i.codigo || "S/C"} - ${i.descricao || ""}` === textoItem);
+      const item = itensCache.find(
+        i => `${i.codigo || "S/C"} - ${i.descricao || ""}` === textoItem
+      );
       if (!item) {
         alert("Item não encontrado. Escolha um dos itens sugeridos na lista.");
         return;
@@ -1014,7 +1006,9 @@
     // Excluir movimentação (com ajuste de estoque para Entrada/Saída)
     async function excluirMovimentacao(mov) {
       const item = itensCache.find(i => i.id === mov.itemId);
-      const msgBase = `Deseja excluir esta movimentação?\n\n${mov.tipo} de ${mov.quantidade} un. do item ${mov.codigo} - ${mov.descricao}`;
+      const msgBase = `Deseja excluir esta movimentação?\n\n${mov.tipo} de ${mov.quantidade} un. do item ${
+        (mov.codigo ? mov.codigo + " - " : "") + (mov.descricao || "")
+      }`;
       let msg = msgBase;
 
       if (mov.tipo === "Ajuste") {
@@ -1032,9 +1026,9 @@
           const qtd = Number(mov.quantidade || 0);
 
           if (mov.tipo === "Entrada") {
-            novoEstoque -= qtd;
+            novoEstoque -= qtd; // desfaz entrada
           } else if (mov.tipo === "Saída") {
-            novoEstoque += qtd;
+            novoEstoque += qtd; // desfaz saída
           }
 
           const itemRef = doc(db, "itens_almox", item.id);
