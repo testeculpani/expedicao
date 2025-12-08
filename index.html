@@ -210,6 +210,7 @@
       background: #e5f3fb;
       font-size: 12px;
       color: #374151;
+      white-space: nowrap;
     }
     tbody tr:nth-child(odd) {
       background: #fcfdff;
@@ -234,6 +235,12 @@
     .detail-label {
       color: #6b7280;
       font-weight: 500;
+    }
+
+    /* Cabeçalhos clicáveis (ordenação) */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
     }
 
     /* Modal */
@@ -368,11 +375,11 @@
           <table>
             <thead>
               <tr>
-                <th>Item (código - descrição)</th>
-                <th>Setor</th>
-                <th>Estoque</th>
-                <th>Mínimo</th>
-                <th>Status</th>
+                <th id="th-item" class="sortable">Item (código - descrição)</th>
+                <th id="th-setor">Setor</th>
+                <th id="th-estoque" class="sortable">Estoque</th>
+                <th id="th-minimo" class="sortable">Mínimo</th>
+                <th id="th-status">Status</th>
               </tr>
             </thead>
             <tbody id="tabela-itens">
@@ -644,6 +651,10 @@
     const filtroBusca = document.getElementById("filtro-busca");
     const filtroSetor = document.getElementById("filtro-setor");
 
+    const thItem = document.getElementById("th-item");
+    const thEstoque = document.getElementById("th-estoque");
+    const thMinimo = document.getElementById("th-minimo");
+
     const cardTotal = document.getElementById("card-total-itens");
     const cardAbaixoMin = document.getElementById("card-abaixo-minimo");
     const cardCriticos = document.getElementById("card-criticos");
@@ -689,6 +700,44 @@
     let itemSelecionado = null;
     let movCache = [];
     let modoEdicaoItem = false;
+
+    // Estado de ordenação
+    const ordenacaoItens = {
+      coluna: "descricao", // 'descricao' | 'estoque' | 'minimo'
+      direcao: "asc"       // 'asc' | 'desc'
+    };
+
+    function atualizarCabecalhosOrdenacao() {
+      thItem.textContent = "Item (código - descrição)";
+      thEstoque.textContent = "Estoque";
+      thMinimo.textContent = "Mínimo";
+
+      const seta = ordenacaoItens.direcao === "asc" ? " ▲" : " ▼";
+
+      if (ordenacaoItens.coluna === "descricao") {
+        thItem.textContent += seta;
+      } else if (ordenacaoItens.coluna === "estoque") {
+        thEstoque.textContent += seta;
+      } else if (ordenacaoItens.coluna === "minimo") {
+        thMinimo.textContent += seta;
+      }
+    }
+
+    function definirOrdenacao(coluna) {
+      if (ordenacaoItens.coluna === coluna) {
+        // só troca a direção
+        ordenacaoItens.direcao = ordenacaoItens.direcao === "asc" ? "desc" : "asc";
+      } else {
+        ordenacaoItens.coluna = coluna;
+        ordenacaoItens.direcao = "asc";
+      }
+      atualizarCabecalhosOrdenacao();
+      renderTabelaItens();
+    }
+
+    thItem.addEventListener("click", () => definirOrdenacao("descricao"));
+    thEstoque.addEventListener("click", () => definirOrdenacao("estoque"));
+    thMinimo.addEventListener("click", () => definirOrdenacao("minimo"));
 
     // ---------- MODAL ITENS ----------
     function abrirModalItemNovo() {
@@ -785,7 +834,26 @@
       let abaixoMin = 0;
       let criticos = 0;
 
-      itensCache.forEach((item) => {
+      // copia e ordena
+      const listaOrdenada = [...itensCache].sort((a, b) => {
+        let comp = 0;
+
+        if (ordenacaoItens.coluna === "descricao") {
+          const aTexto = ((a.codigo || "") + " " + (a.descricao || "")).toLowerCase();
+          const bTexto = ((b.codigo || "") + " " + (b.descricao || "")).toLowerCase();
+          if (aTexto < bTexto) comp = -1;
+          else if (aTexto > bTexto) comp = 1;
+          else comp = 0;
+        } else if (ordenacaoItens.coluna === "estoque") {
+          comp = Number(a.estoque || 0) - Number(b.estoque || 0);
+        } else if (ordenacaoItens.coluna === "minimo") {
+          comp = Number(a.minimo || 0) - Number(b.minimo || 0);
+        }
+
+        return ordenacaoItens.direcao === "asc" ? comp : -comp;
+      });
+
+      listaOrdenada.forEach((item) => {
         let ok = true;
 
         if (busca) {
@@ -1146,6 +1214,7 @@
     }
 
     // Início
+    atualizarCabecalhosOrdenacao();
     setView("itens");
     limparSelecao();
   </script>
