@@ -1,1222 +1,662 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <title>Almoxarifado – Peças de Manutenção</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Pallets</title>
   <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-2: #1f2937;
+      --line: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --radius: 18px;
+    }
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #e0f2fe 0%, #f9fafb 40%, #f3f4f6 100%);
-      color: #111827;
-    }
-
-    header {
-      background: #0f6dbd;
-      color: white;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 6px rgba(15, 118, 210, 0.35);
-    }
-    header h1 {
-      font-size: 18px;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    header h1::before {
-      content: "🧰";
-      font-size: 20px;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin-left: 10px;
-      font-weight: bold;
-      font-size: 13px;
-      opacity: 0.9;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      transition: background 0.2s, opacity 0.2s, border-color 0.2s;
-    }
-    nav a:hover {
-      opacity: 1;
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.4);
-    }
-    nav a.active {
-      background: white;
-      color: #0f6dbd;
-      opacity: 1;
-      border-color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      color: var(--text);
     }
 
     .container {
-      padding: 15px;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 20px;
     }
 
-    .cards {
+    .header {
+      background: linear-gradient(135deg, #1d4ed8, #0f172a);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .header p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(17,24,39,.95);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0f172a;
+      color: var(--white);
+      outline: none;
+      font-size: 15px;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-secondary { background: #475569; color: var(--white); }
+    .btn-danger { background: var(--red); color: var(--white); }
+    .btn-success { background: var(--green); color: var(--white); }
+    .btn-warning { background: var(--yellow); color: #111827; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, rgba(30,41,59,.95), rgba(15,23,42,.95));
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .stat .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat .value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .toolbar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 15px;
+      margin-bottom: 14px;
     }
-    .card {
-      background: white;
-      padding: 10px 12px;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      min-width: 160px;
+
+    .toolbar input {
       flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: linear-gradient(180deg, #0ea5e9, #2563eb);
-    }
-    .card-title {
-      font-size: 11px;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .card-value {
-      font-size: 20px;
-      font-weight: bold;
-      margin-top: 4px;
-    }
-    .card-value.critico { color: #dc2626; }
-
-    .top-panel {
-      display: flex;
-      gap: 15px;
-      align-items: flex-start;
-    }
-    .left-panel {
-      flex: 2;
-      min-width: 0;
-    }
-    .right-panel {
-      flex: 1;
-      min-width: 260px;
-      background: white;
+      min-width: 220px;
+      padding: 11px 14px;
       border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.10);
-      padding: 12px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--line);
+      background: #0f172a;
+      color: var(--white);
     }
 
-    .right-panel::before {
-      content: "Detalhes do item";
-      display: block;
-      font-size: 12px;
-      font-weight: bold;
-      color: #0f6dbd;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 4px;
-    }
-
-    .filtros {
-      margin-bottom: 10px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .filtros input,
-    .filtros select {
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      font-size: 13px;
-      background: white;
-    }
-    .filtros input:focus,
-    .filtros select:focus,
-    .modal input:focus,
-    .modal select:focus,
-    .modal textarea:focus {
-      outline: none;
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 1px rgba(14,165,233,0.35);
-    }
-
-    .btn {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      transition: transform 0.08s, box-shadow 0.08s, background 0.2s;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
-      color: white;
-      box-shadow: 0 1px 4px rgba(37,99,235,0.4);
-    }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 3px 8px rgba(37,99,235,0.5);
-    }
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    .btn-secondary:hover {
-      background: #d1d5db;
-    }
-    .btn-danger {
-      background: #ef4444;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #dc2626;
+    .table-wrap {
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      font-size: 13px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      min-width: 900px;
+      background: #0b1220;
     }
+
     th, td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 10px;
       text-align: left;
-    }
-    th {
-      background: #e5f3fb;
-      font-size: 12px;
-      color: #374151;
-      white-space: nowrap;
-    }
-    tbody tr:nth-child(odd) {
-      background: #fcfdff;
-    }
-    tr:hover {
-      background: #eef6ff;
-      cursor: pointer;
-    }
-    .status-ok { color: #16a34a; font-weight: bold; }
-    .status-alerta { color: #f97316; font-weight: bold; }
-    .status-critico { color: #dc2626; font-weight: bold; }
-
-    .detail-title {
+      border-bottom: 1px solid rgba(255,255,255,.06);
       font-size: 14px;
-      font-weight: bold;
-      margin: 8px 0 4px;
-    }
-    .detail-line {
-      font-size: 13px;
-      margin-bottom: 3px;
-    }
-    .detail-label {
-      color: #6b7280;
-      font-weight: 500;
     }
 
-    /* Cabeçalhos clicáveis (ordenação) */
-    th.sortable {
-      cursor: pointer;
-      user-select: none;
+    th {
+      background: #162033;
+      color: #cbd5e1;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
-    /* Modal */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
+    tr:hover td {
+      background: rgba(255,255,255,.03);
     }
-    .modal {
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-      border: 1px solid #e5e7eb;
-    }
-    .modal h2 {
-      margin-top: 0;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .modal h2::before {
-      content: "📦";
-    }
-    .modal .form-row {
-      display: flex;
-      gap: 10px;
-    }
-    .modal label {
+
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
       font-size: 12px;
-      color: #4b5563;
-      display: block;
-      margin-bottom: 2px;
-    }
-    .modal input,
-    .modal select,
-    .modal textarea {
-      width: 100%;
-      padding: 6px 8px;
-      font-size: 13px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      margin-bottom: 8px;
-      background: #f9fafb;
-    }
-    .modal textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 5px;
+      font-weight: 700;
     }
 
-    /* REMOVER SETAS DOS INPUTS NUMBER */
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
+    .tag.entrada {
+      background: rgba(34,197,94,.15);
+      color: #86efac;
+      border: 1px solid rgba(34,197,94,.35);
     }
 
-    @media (max-width: 900px) {
-      .top-panel {
-        flex-direction: column;
+    .tag.saida {
+      background: rgba(239,68,68,.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239,68,68,.35);
+    }
+
+    .assinatura {
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
-      .right-panel {
-        order: -1;
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
       }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 14px; }
+      .header h1 { font-size: 24px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .btn-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      .header, .card, .stat, .table-wrap { box-shadow: none; }
+      .no-print { display: none !important; }
+      table { min-width: auto; }
+      th { position: static; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Almoxarifado – Peças de Manutenção</h1>
-    <nav>
-      <a href="#" id="nav-itens" class="active">Itens</a>
-      <a href="#" id="nav-mov">Movimentações</a>
-      <a href="#" id="nav-rel">Relatórios</a>
-      <a href="relatorios.html" id="nav-rel-page">Página de Relatórios</a>
-    </nav>
-  </header>
-
   <div class="container">
-    <!-- VIEW ITENS -->
-    <div id="view-itens">
-      <!-- Cards resumo -->
-      <div class="cards">
-        <div class="card">
-          <div class="card-title">Total de itens (filtrados)</div>
-          <div class="card-value" id="card-total-itens">0</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Abaixo do mínimo</div>
-          <div class="card-value critico" id="card-abaixo-minimo">0</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Itens críticos (Alta criticidade)</div>
-          <div class="card-value" id="card-criticos">0</div>
-        </div>
-      </div>
-
-      <div class="top-panel">
-        <!-- Lista de itens -->
-        <div class="left-panel">
-          <div class="filtros">
-            <input type="text" id="filtro-busca" placeholder="Buscar por código ou descrição">
-            <select id="filtro-setor">
-              <option value="">Setor</option>
-              <option value="CROMAGEM">CROMAGEM</option>
-              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-              <option value="METALURGICA">METALURGICA</option>
-              <option value="ENCABAGEM">ENCABAGEM</option>
-              <option value="SERRALHEIRO">SERRALHEIRO</option>
-            </select>
-            <button class="btn btn-primary" id="btn-novo-item">+ Novo item</button>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th id="th-item" class="sortable">Item (código - descrição)</th>
-                <th id="th-setor">Setor</th>
-                <th id="th-estoque" class="sortable">Estoque</th>
-                <th id="th-minimo" class="sortable">Mínimo</th>
-                <th id="th-status">Status</th>
-              </tr>
-            </thead>
-            <tbody id="tabela-itens">
-              <!-- Linhas via JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Detalhes + ações -->
-        <div class="right-panel">
-          <div id="detalhes-item" style="margin-top: 4px;">
-            <div class="detail-title" id="detalhe-descricao">Selecione um item…</div>
-            <div class="detail-line"><span class="detail-label">Setor:</span> <span id="detalhe-setor">-</span></div>
-            <div class="detail-line"><span class="detail-label">Criticidade:</span> <span id="detalhe-criticidade">-</span></div>
-            <div class="detail-line"><span class="detail-label">Estoque atual:</span> <span id="detalhe-estoque">-</span></div>
-            <div class="detail-line"><span class="detail-label">Estoque mínimo:</span> <span id="detalhe-minimo">-</span></div>
-            <div class="detail-line"><span class="detail-label">Observações:</span> <span id="detalhe-obs">-</span></div>
-          </div>
-          <button
-            class="btn btn-secondary"
-            id="btn-editar-item"
-            style="margin-top:10px;width:100%;"
-            disabled
-          >
-            Editar item selecionado
-          </button>
-          <button
-            class="btn btn-danger"
-            id="btn-excluir-item"
-            style="margin-top:6px;width:100%;"
-            disabled
-          >
-            Excluir item selecionado
-          </button>
-        </div>
-      </div>
+    <div class="header">
+      <h1>Controle de Pallets</h1>
+      <p>Ferramenta simples para registrar entrada, saída, saldo e assinatura do motorista.</p>
     </div>
 
-    <!-- VIEW MOVIMENTAÇÕES -->
-    <div id="view-mov" style="display:none;">
-      <div class="cards">
-        <div class="card">
-          <div class="card-title">Movimentações (últimas filtradas)</div>
-          <div class="card-value" id="card-total-mov">0</div>
+    <div class="grid">
+      <div class="card no-print">
+        <h2>Novo Lançamento</h2>
+
+        <div class="field">
+          <label for="data">Data</label>
+          <input type="date" id="data" />
+        </div>
+
+        <div class="field">
+          <label for="quantidade">Quantidade de pallets</label>
+          <input type="number" id="quantidade" min="1" placeholder="Ex.: 20" />
+        </div>
+
+        <div class="field">
+          <label for="tipo">Movimento</label>
+          <select id="tipo">
+            <option value="saida">Saída</option>
+            <option value="entrada">Entrada</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="motorista">Motorista</label>
+          <input type="text" id="motorista" placeholder="Nome do motorista" />
+        </div>
+
+        <div class="field">
+          <label>Assinatura do motorista</label>
+          <div style="background:#0f172a;border:1px solid var(--line);border-radius:12px;padding:10px;">
+            <canvas id="signaturePad" style="width:100%;height:180px;background:#ffffff;border-radius:10px;display:block;touch-action:none;"></canvas>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+              <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar assinatura</button>
+            </div>
+            <div class="small" style="margin-top:8px;">Assine com o dedo ou caneta touch direto na tela.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="obs">Observação</label>
+          <textarea id="obs" rows="3" placeholder="Opcional"></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="adicionarLancamento()">Salvar</button>
+          <button class="btn-secondary" onclick="limparFormulario()">Limpar</button>
+          <button class="btn-warning" onclick="exportarCSV()">Exportar CSV</button>
+          <button class="btn-danger" onclick="limparTudo()">Apagar Tudo</button>
         </div>
       </div>
 
-      <div class="filtros">
-        <input type="text" id="mov-filtro-busca" placeholder="Buscar por código, descrição ou responsável">
-        <select id="mov-filtro-tipo">
-          <option value="">Tipo</option>
-          <option value="Entrada">Entrada</option>
-          <option value="Saída">Saída</option>
-          <option value="Ajuste">Ajuste</option>
-        </select>
-        <select id="mov-filtro-setor">
-          <option value="">Setor</option>
-          <option value="CROMAGEM">CROMAGEM</option>
-          <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-          <option value="METALURGICA">METALURGICA</option>
-          <option value="ENCABAGEM">ENCABAGEM</option>
-          <option value="SERRALHEIRO">SERRALHEIRO</option>
-        </select>
-        <select id="mov-filtro-motivo">
-          <option value="">Motivo</option>
-          <option value="Preventiva">Preventiva</option>
-          <option value="Corretiva">Corretiva</option>
-          <option value="Projeto">Projeto</option>
-          <option value="Inventário">Inventário</option>
-          <option value="Outro">Outro</option>
-        </select>
-        <button class="btn btn-primary" id="btn-nova-mov">+ Nova movimentação</button>
+      <div>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Saldo atual</div>
+            <div class="value" id="saldoAtual">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Total de entradas</div>
+            <div class="value" id="totalEntradas">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Total de saídas</div>
+            <div class="value" id="totalSaidas">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Lançamentos</div>
+            <div class="value" id="totalRegistros">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Histórico</h2>
+          <div class="toolbar no-print">
+            <input type="text" id="busca" placeholder="Buscar por motorista, assinatura ou observação..." oninput="renderTabela()" />
+            <button class="btn-success" onclick="window.print()">Imprimir</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Quantidade</th>
+                  <th>Entrada / Saída</th>
+                  <th>Saldo</th>
+                  <th>Motorista</th>
+                  <th>Assinatura</th>
+                  <th>Observação</th>
+                  <th class="no-print">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaLancamentos"></tbody>
+            </table>
+          </div>
+          <div id="estadoVazio" class="empty" style="display:none;">Nenhum lançamento cadastrado ainda.</div>
+        </div>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Item (código - descrição)</th>
-            <th>Tipo</th>
-            <th>Qtd</th>
-            <th>Setor</th>
-            <th>Responsável</th>
-            <th>Motivo</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tabela-mov">
-          <!-- Linhas via JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- VIEW RELATÓRIOS (placeholder interno) -->
-    <div id="view-rel" style="display:none;">
-      <p>Relatórios em breve 😄 (podemos montar depois com base em itens e movimentações).</p>
     </div>
   </div>
 
-  <!-- Modal Novo/Editar Item -->
-  <div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal">
-      <h2 id="titulo-modal-item">Novo item de almoxarifado</h2>
-      <form id="form-novo-item">
-        <label for="campo-descricao">Descrição</label>
-        <input type="text" id="campo-descricao" required>
+  <script>
+    const STORAGE_KEY = 'controle_pallets_registros';
+    let registros = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let signaturePad, signatureCtx, desenhando = false;
 
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="campo-setor">Setor</label>
-            <select id="campo-setor" required>
-              <option value="">Selecione…</option>
-              <option value="CROMAGEM">CROMAGEM</option>
-              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-              <option value="METALURGICA">METALURGICA</option>
-              <option value="ENCABAGEM">ENCABAGEM</option>
-              <option value="SERRALHEIRO">SERRALHEIRO</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="campo-estoque">Estoque atual</label>
-            <input type="number" id="campo-estoque" value="0">
-          </div>
-          <div style="flex:1;">
-            <label for="campo-minimo">Estoque mínimo</label>
-            <input type="number" id="campo-minimo" value="0">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="campo-criticidade">Criticidade</label>
-            <select id="campo-criticidade">
-              <option value="Baixa">Baixa</option>
-              <option value="Média">Média</option>
-              <option value="Alta">Alta</option>
-            </select>
-          </div>
-        </div>
-
-        <label for="campo-obs">Observações</label>
-        <textarea id="campo-obs" placeholder="Detalhes importantes da peça…"></textarea>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" id="btn-salvar-item">Salvar item</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Nova Movimentação -->
-  <div class="modal-backdrop" id="modal-backdrop-mov">
-    <div class="modal">
-      <h2>Nova movimentação</h2>
-      <form id="form-nova-mov">
-        <label for="mov-item-busca">Item</label>
-        <input type="text" id="mov-item-busca" placeholder="Digite código ou parte da descrição e escolha na lista" list="lista-itens" required>
-        <datalist id="lista-itens"></datalist>
-
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="mov-tipo">Tipo</label>
-            <select id="mov-tipo" required>
-              <option value="Entrada">Entrada</option>
-              <option value="Saída">Saída</option>
-              <option value="Ajuste">Ajuste</option>
-            </select>
-          </div>
-          <div style="flex:1;">
-            <label for="mov-quantidade">Quantidade</label>
-            <input type="number" id="mov-quantidade" value="1" min="0" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="mov-setor">Setor</label>
-            <select id="mov-setor">
-              <option value="">(usar do item)</option>
-              <option value="CROMAGEM">CROMAGEM</option>
-              <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-              <option value="METALURGICA">METALURGICA</option>
-              <option value="ENCABAGEM">ENCABAGEM</option>
-              <option value="SERRALHEIRO">SERRALHEIRO</option>
-            </select>
-          </div>
-          <div style="flex:1;">
-            <label for="mov-responsavel">Responsável</label>
-            <input type="text" id="mov-responsavel" placeholder="Quem retirou / lançou">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div style="flex:1;">
-            <label for="mov-motivo">Motivo</label>
-            <select id="mov-motivo">
-              <option value="">Selecione…</option>
-              <option value="Preventiva">Preventiva</option>
-              <option value="Corretiva">Corretiva</option>
-              <option value="Projeto">Projeto</option>
-              <option value="Inventário">Inventário</option>
-              <option value="Outro">Outro</option>
-            </select>
-          </div>
-        </div>
-
-        <label for="mov-obs">Observações</label>
-        <textarea id="mov-obs" placeholder="Detalhes da movimentação…"></textarea>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancelar-modal-mov">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar movimentação</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Firebase + Lógica JS -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy,
-      doc, updateDoc, serverTimestamp, deleteDoc
-    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBM3huaVIYn2bqrrzupYTQBqFnOtSY6Zr0",
-      authDomain: "almoxarifado-e9992.firebaseapp.com",
-      projectId: "almoxarifado-e9992",
-      storageBucket: "almoxarifado-e9992.firebasestorage.app",
-      messagingSenderId: "1035781414746",
-      appId: "1:1035781414746:web:89934cb0c0ef81b9c85d63"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const colItens = collection(db, "itens_almox");
-    const colMov = collection(db, "movimentacoes_almox");
-
-    // NAV
-    const navItens = document.getElementById("nav-itens");
-    const navMov = document.getElementById("nav-mov");
-    const navRel = document.getElementById("nav-rel");
-    const viewItens = document.getElementById("view-itens");
-    const viewMov = document.getElementById("view-mov");
-    const viewRel = document.getElementById("view-rel");
-
-    function setView(view) {
-      viewItens.style.display = view === "itens" ? "block" : "none";
-      viewMov.style.display = view === "mov" ? "block" : "none";
-      viewRel.style.display = view === "rel" ? "block" : "none";
-
-      navItens.classList.toggle("active", view === "itens");
-      navMov.classList.toggle("active", view === "mov");
-      navRel.classList.toggle("active", view === "rel");
+    function hojeISO() {
+      const hoje = new Date();
+      const offset = hoje.getTimezoneOffset();
+      const local = new Date(hoje.getTime() - offset * 60000);
+      return local.toISOString().split('T')[0];
     }
 
-    navItens.addEventListener("click", (e) => { e.preventDefault(); setView("itens"); });
-    navMov.addEventListener("click", (e) => { e.preventDefault(); setView("mov"); });
-    navRel.addEventListener("click", (e) => { e.preventDefault(); setView("rel"); });
+    document.getElementById('data').value = hojeISO();
 
-    // ITENS
-    const tabelaItens = document.getElementById("tabela-itens");
-    const filtroBusca = document.getElementById("filtro-busca");
-    const filtroSetor = document.getElementById("filtro-setor");
-
-    const thItem = document.getElementById("th-item");
-    const thEstoque = document.getElementById("th-estoque");
-    const thMinimo = document.getElementById("th-minimo");
-
-    const cardTotal = document.getElementById("card-total-itens");
-    const cardAbaixoMin = document.getElementById("card-abaixo-minimo");
-    const cardCriticos = document.getElementById("card-criticos");
-
-    const detDesc = document.getElementById("detalhe-descricao");
-    const detSetor = document.getElementById("detalhe-setor");
-    const detCrit = document.getElementById("detalhe-criticidade");
-    const detEst = document.getElementById("detalhe-estoque");
-    const detMin = document.getElementById("detalhe-minimo");
-    const detObs = document.getElementById("detalhe-obs");
-
-    const btnNovoItem = document.getElementById("btn-novo-item");
-    const modalBackdrop = document.getElementById("modal-backdrop");
-    const btnCancelarModal = document.getElementById("btn-cancelar-modal");
-    const formNovoItem = document.getElementById("form-novo-item");
-    const tituloModalItem = document.getElementById("titulo-modal-item");
-    const btnSalvarItem = document.getElementById("btn-salvar-item");
-    const btnEditarItem = document.getElementById("btn-editar-item");
-    const btnExcluirItem = document.getElementById("btn-excluir-item");
-
-    // MOV
-    const tabelaMov = document.getElementById("tabela-mov");
-    const cardTotalMov = document.getElementById("card-total-mov");
-    const movFiltroBusca = document.getElementById("mov-filtro-busca");
-    const movFiltroTipo = document.getElementById("mov-filtro-tipo");
-    const movFiltroSetor = document.getElementById("mov-filtro-setor");
-    const movFiltroMotivo = document.getElementById("mov-filtro-motivo");
-    const btnNovaMov = document.getElementById("btn-nova-mov");
-    const modalBackdropMov = document.getElementById("modal-backdrop-mov");
-    const btnCancelarModalMov = document.getElementById("btn-cancelar-modal-mov");
-    const formNovaMov = document.getElementById("form-nova-mov");
-    const movItemBusca = document.getElementById("mov-item-busca");
-    const listaItens = document.getElementById("lista-itens");
-
-    const movTipo = document.getElementById("mov-tipo");
-    const movQuantidade = document.getElementById("mov-quantidade");
-    const movSetor = document.getElementById("mov-setor");
-    const movResponsavel = document.getElementById("mov-responsavel");
-    const movMotivo = document.getElementById("mov-motivo");
-    const movObs = document.getElementById("mov-obs");
-
-    let itensCache = [];
-    let itemSelecionado = null;
-    let movCache = [];
-    let modoEdicaoItem = false;
-
-    // Estado de ordenação
-    const ordenacaoItens = {
-      coluna: "descricao", // 'descricao' | 'estoque' | 'minimo'
-      direcao: "asc"       // 'asc' | 'desc'
-    };
-
-    function atualizarCabecalhosOrdenacao() {
-      thItem.textContent = "Item (código - descrição)";
-      thEstoque.textContent = "Estoque";
-      thMinimo.textContent = "Mínimo";
-
-      const seta = ordenacaoItens.direcao === "asc" ? " ▲" : " ▼";
-
-      if (ordenacaoItens.coluna === "descricao") {
-        thItem.textContent += seta;
-      } else if (ordenacaoItens.coluna === "estoque") {
-        thEstoque.textContent += seta;
-      } else if (ordenacaoItens.coluna === "minimo") {
-        thMinimo.textContent += seta;
-      }
+    function ajustarCanvas() {
+      signaturePad = document.getElementById('signaturePad');
+      if (!signaturePad) return;
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = signaturePad.getBoundingClientRect();
+      signaturePad.width = rect.width * ratio;
+      signaturePad.height = rect.height * ratio;
+      signatureCtx = signaturePad.getContext('2d');
+      signatureCtx.scale(ratio, ratio);
+      signatureCtx.lineWidth = 2.2;
+      signatureCtx.lineCap = 'round';
+      signatureCtx.lineJoin = 'round';
+      signatureCtx.strokeStyle = '#111827';
+      signatureCtx.fillStyle = '#ffffff';
+      signatureCtx.fillRect(0, 0, rect.width, rect.height);
     }
 
-    function definirOrdenacao(coluna) {
-      if (ordenacaoItens.coluna === coluna) {
-        // só troca a direção
-        ordenacaoItens.direcao = ordenacaoItens.direcao === "asc" ? "desc" : "asc";
-      } else {
-        ordenacaoItens.coluna = coluna;
-        ordenacaoItens.direcao = "asc";
-      }
-      atualizarCabecalhosOrdenacao();
-      renderTabelaItens();
-    }
-
-    thItem.addEventListener("click", () => definirOrdenacao("descricao"));
-    thEstoque.addEventListener("click", () => definirOrdenacao("estoque"));
-    thMinimo.addEventListener("click", () => definirOrdenacao("minimo"));
-
-    // ---------- MODAL ITENS ----------
-    function abrirModalItemNovo() {
-      modoEdicaoItem = false;
-      tituloModalItem.textContent = "Novo item de almoxarifado";
-      btnSalvarItem.textContent = "Salvar item";
-      formNovoItem.reset();
-      document.getElementById("campo-estoque").value = 0;
-      document.getElementById("campo-minimo").value = 0;
-      document.getElementById("campo-criticidade").value = "Baixa";
-      modalBackdrop.style.display = "flex";
-    }
-
-    function abrirModalItemEdicao() {
-      if (!itemSelecionado) {
-        alert("Selecione um item para editar.");
-        return;
-      }
-      modoEdicaoItem = true;
-      tituloModalItem.textContent = "Editar item de almoxarifado";
-      btnSalvarItem.textContent = "Salvar alterações";
-
-      document.getElementById("campo-descricao").value = itemSelecionado.descricao || "";
-      document.getElementById("campo-setor").value = itemSelecionado.setor || "";
-      document.getElementById("campo-estoque").value = itemSelecionado.estoque ?? 0;
-      document.getElementById("campo-minimo").value = itemSelecionado.minimo ?? 0;
-      document.getElementById("campo-criticidade").value = itemSelecionado.criticidade || "Baixa";
-      document.getElementById("campo-obs").value = itemSelecionado.obs || "";
-
-      modalBackdrop.style.display = "flex";
-    }
-
-    function fecharModalItem() {
-      modalBackdrop.style.display = "none";
-    }
-
-    btnNovoItem.addEventListener("click", abrirModalItemNovo);
-    btnEditarItem.addEventListener("click", abrirModalItemEdicao);
-    btnCancelarModal.addEventListener("click", fecharModalItem);
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) fecharModalItem();
-    });
-
-    // ---------- MODAL MOV ----------
-    function preencherDatalistItens() {
-      listaItens.innerHTML = "";
-      if (itensCache.length === 0) return;
-
-      itensCache.forEach((item) => {
-        const opt = document.createElement("option");
-        opt.value = `${item.codigo || "S/C"} - ${item.descricao || ""}`;
-        listaItens.appendChild(opt);
-      });
-    }
-
-    function abrirModalMov() {
-      formNovaMov.reset();
-      movQuantidade.value = 1;
-      movTipo.value = "Entrada";
-      preencherDatalistItens();
-      modalBackdropMov.style.display = "flex";
-    }
-
-    function fecharModalMov() {
-      modalBackdropMov.style.display = "none";
-    }
-
-    btnNovaMov.addEventListener("click", abrirModalMov);
-    btnCancelarModalMov.addEventListener("click", fecharModalMov);
-    modalBackdropMov.addEventListener("click", (e) => {
-      if (e.target === modalBackdropMov) fecharModalMov();
-    });
-
-    // ---------- STATUS ESTOQUE ----------
-    function getStatusEstoque(item) {
-      const estoque = Number(item.estoque || 0);
-      const minimo = Number(item.minimo || 0);
-      if (minimo <= 0) return { texto: "Sem mínimo", classe: "status-ok" };
-      if (estoque <= 0) return { texto: "Sem estoque", classe: "status-critico" };
-      if (estoque < minimo) return { texto: "Abaixo do mínimo", classe: "status-critico" };
-      if (estoque === minimo) return { texto: "No mínimo", classe: "status-alerta" };
-      if (estoque < minimo * 1.3) return { texto: "Próximo do mínimo", classe: "status-alerta" };
-      return { texto: "OK", classe: "status-ok" };
-    }
-
-    // ---------- RENDER ITENS ----------
-    function renderTabelaItens() {
-      const busca = (filtroBusca.value || "").toLowerCase();
-      const setor = filtroSetor.value;
-
-      tabelaItens.innerHTML = "";
-
-      let total = 0;
-      let abaixoMin = 0;
-      let criticos = 0;
-
-      // copia e ordena
-      const listaOrdenada = [...itensCache].sort((a, b) => {
-        let comp = 0;
-
-        if (ordenacaoItens.coluna === "descricao") {
-          const aTexto = ((a.codigo || "") + " " + (a.descricao || "")).toLowerCase();
-          const bTexto = ((b.codigo || "") + " " + (b.descricao || "")).toLowerCase();
-          if (aTexto < bTexto) comp = -1;
-          else if (aTexto > bTexto) comp = 1;
-          else comp = 0;
-        } else if (ordenacaoItens.coluna === "estoque") {
-          comp = Number(a.estoque || 0) - Number(b.estoque || 0);
-        } else if (ordenacaoItens.coluna === "minimo") {
-          comp = Number(a.minimo || 0) - Number(b.minimo || 0);
-        }
-
-        return ordenacaoItens.direcao === "asc" ? comp : -comp;
-      });
-
-      listaOrdenada.forEach((item) => {
-        let ok = true;
-
-        if (busca) {
-          const texto = (
-            (item.codigo || "") + " " +
-            (item.descricao || "")
-          ).toLowerCase();
-          if (!texto.includes(busca)) ok = false;
-        }
-        if (setor && item.setor !== setor) ok = false;
-
-        if (!ok) return;
-
-        total++;
-        const status = getStatusEstoque(item);
-        if (status.classe === "status-critico") abaixoMin++;
-        if (item.criticidade === "Alta") criticos++;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${item.codigo ? item.codigo + " - " : ""}${item.descricao || ""}</td>
-          <td>${item.setor || ""}</td>
-          <td>${item.estoque ?? 0}</td>
-          <td>${item.minimo ?? 0}</td>
-          <td class="${status.classe}">${status.texto}</td>
-        `;
-        tr.addEventListener("click", () => selecionarItem(item));
-        tabelaItens.appendChild(tr);
-      });
-
-      cardTotal.textContent = total;
-      cardAbaixoMin.textContent = abaixoMin;
-      cardCriticos.textContent = criticos;
-    }
-
-    function selecionarItem(item) {
-      itemSelecionado = item;
-      detDesc.textContent =
-        (item.codigo ? item.codigo + " - " : "") +
-        (item.descricao || "(sem descrição)");
-      detSetor.textContent = item.setor || "-";
-      detCrit.textContent = item.criticidade || "-";
-      detEst.textContent = item.estoque ?? "-";
-      detMin.textContent = item.minimo ?? "-";
-      detObs.textContent = item.obs || "-";
-      btnEditarItem.disabled = false;
-      btnExcluirItem.disabled = false;
-    }
-
-    function limparSelecao() {
-      itemSelecionado = null;
-      detDesc.textContent = "Selecione um item…";
-      detSetor.textContent = "-";
-      detCrit.textContent = "-";
-      detEst.textContent = "-";
-      detMin.textContent = "-";
-      detObs.textContent = "-";
-      btnEditarItem.disabled = true;
-      btnExcluirItem.disabled = true;
-    }
-
-    // Listener itens
-    const qItens = query(colItens, orderBy("descricao"));
-    onSnapshot(qItens, (snapshot) => {
-      itensCache = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      renderTabelaItens();
-      preencherDatalistItens();
-    });
-
-    filtroBusca.addEventListener("input", renderTabelaItens);
-    filtroSetor.addEventListener("change", renderTabelaItens);
-
-    // ---------- GERAR CÓDIGO AUTOMÁTICO ----------
-    function gerarCodigoSequencial() {
-      if (itensCache.length === 0) {
-        return "0001";
-      }
-      const numeros = itensCache
-        .map(i => parseInt(String(i.codigo || "").replace(/\D/g, ""), 10))
-        .filter(n => !isNaN(n));
-      const maxAtual = numeros.length > 0 ? Math.max(...numeros) : 0;
-      const proximo = maxAtual + 1;
-      return String(proximo).padStart(4, "0"); // 0001, 0002...
-    }
-
-    // Salvar (novo ou edição) item
-    formNovoItem.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const descricao = document.getElementById("campo-descricao").value.trim();
-      const setor = document.getElementById("campo-setor").value || "";
-
-      if (!descricao || !setor) {
-        alert("Preencha descrição e setor.");
-        return;
-      }
-
-      let codigo;
-      if (modoEdicaoItem && itemSelecionado) {
-        codigo = itemSelecionado.codigo || gerarCodigoSequencial();
-      } else {
-        codigo = gerarCodigoSequencial();
-      }
-
-      const novoItem = {
-        codigo: codigo,
-        descricao: descricao,
-        setor: setor,
-        estoque: Number(document.getElementById("campo-estoque").value || 0),
-        minimo: Number(document.getElementById("campo-minimo").value || 0),
-        criticidade: document.getElementById("campo-criticidade").value || "Baixa",
-        obs: document.getElementById("campo-obs").value.trim()
+    function posicaoNoCanvas(event) {
+      const rect = signaturePad.getBoundingClientRect();
+      const toque = event.touches ? event.touches[0] : event;
+      return {
+        x: toque.clientX - rect.left,
+        y: toque.clientY - rect.top
       };
+    }
 
-      try {
-        if (modoEdicaoItem && itemSelecionado) {
-          const refItem = doc(db, "itens_almox", itemSelecionado.id);
-          await updateDoc(refItem, novoItem);
+    function iniciarAssinatura(event) {
+      if (!signatureCtx) return;
+      desenhando = true;
+      const pos = posicaoNoCanvas(event);
+      signatureCtx.beginPath();
+      signatureCtx.moveTo(pos.x, pos.y);
+      event.preventDefault();
+    }
+
+    function desenharAssinatura(event) {
+      if (!desenhando || !signatureCtx) return;
+      const pos = posicaoNoCanvas(event);
+      signatureCtx.lineTo(pos.x, pos.y);
+      signatureCtx.stroke();
+      event.preventDefault();
+    }
+
+    function finalizarAssinatura() {
+      desenhando = false;
+    }
+
+    function limparAssinatura() {
+      if (!signaturePad || !signatureCtx) return;
+      signatureCtx.clearRect(0, 0, signaturePad.width, signaturePad.height);
+      const rect = signaturePad.getBoundingClientRect();
+      signatureCtx.fillStyle = '#ffffff';
+      signatureCtx.fillRect(0, 0, rect.width, rect.height);
+    }
+
+    function assinaturaVazia() {
+      if (!signaturePad) return true;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = signaturePad.width;
+      tempCanvas.height = signaturePad.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.fillStyle = '#ffffff';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      return signaturePad.toDataURL() === tempCanvas.toDataURL();
+    }
+
+    function obterAssinaturaBase64() {
+      return signaturePad.toDataURL('image/png');
+    }
+
+    window.addEventListener('resize', () => {
+      const assinaturaAtual = signaturePad && !assinaturaVazia() ? signaturePad.toDataURL('image/png') : null;
+      ajustarCanvas();
+      if (assinaturaAtual) {
+        const img = new Image();
+        img.onload = () => {
+          const rect = signaturePad.getBoundingClientRect();
+          signatureCtx.drawImage(img, 0, 0, rect.width, rect.height);
+        };
+        img.src = assinaturaAtual;
+      }
+    });
+
+    window.addEventListener('load', () => {
+      ajustarCanvas();
+      signaturePad.addEventListener('mousedown', iniciarAssinatura);
+      signaturePad.addEventListener('mousemove', desenharAssinatura);
+      window.addEventListener('mouseup', finalizarAssinatura);
+      signaturePad.addEventListener('touchstart', iniciarAssinatura, { passive: false });
+      signaturePad.addEventListener('touchmove', desenharAssinatura, { passive: false });
+      window.addEventListener('touchend', finalizarAssinatura);
+    });
+
+    function salvarStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
+    }
+
+    function formatarData(dataISO) {
+      if (!dataISO) return '';
+      const [ano, mes, dia] = dataISO.split('-');
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function calcularSaldos() {
+      let saldo = 0;
+      registros.sort((a, b) => new Date(a.data) - new Date(b.data) || a.id - b.id);
+      registros.forEach(item => {
+        if (item.tipo === 'entrada') {
+          saldo += Number(item.quantidade);
         } else {
-          await addDoc(colItens, novoItem);
+          saldo -= Number(item.quantidade);
         }
-        fecharModalItem();
-      } catch (err) {
-        console.error("Erro ao salvar item:", err);
-        alert("Erro ao salvar item. Veja o console para detalhes.");
-      }
-    });
+        item.saldo = saldo;
+      });
+    }
 
-    // Excluir item
-    btnExcluirItem.addEventListener("click", async () => {
-      if (!itemSelecionado) {
-        alert("Nenhum item selecionado.");
+    function atualizarPainel() {
+      calcularSaldos();
+      const entradas = registros.filter(r => r.tipo === 'entrada').reduce((acc, r) => acc + Number(r.quantidade), 0);
+      const saidas = registros.filter(r => r.tipo === 'saida').reduce((acc, r) => acc + Number(r.quantidade), 0);
+      const saldo = registros.length ? registros[registros.length - 1].saldo : 0;
+
+      document.getElementById('saldoAtual').textContent = saldo;
+      document.getElementById('totalEntradas').textContent = entradas;
+      document.getElementById('totalSaidas').textContent = saidas;
+      document.getElementById('totalRegistros').textContent = registros.length;
+    }
+
+    function adicionarLancamento() {
+      const data = document.getElementById('data').value;
+      const quantidade = Number(document.getElementById('quantidade').value);
+      const tipo = document.getElementById('tipo').value;
+      const motorista = document.getElementById('motorista').value.trim();
+      const assinatura = obterAssinaturaBase64();
+      const obs = document.getElementById('obs').value.trim();
+
+      if (!data) {
+        alert('Preencha a data.');
         return;
       }
 
-      const qtdMov = movCache.filter(m => m.itemId === itemSelecionado.id).length;
-      let msg = `Tem certeza que deseja excluir o item:\n\n${
-        (itemSelecionado.codigo ? itemSelecionado.codigo + " - " : "") +
-        (itemSelecionado.descricao || "")
-      }?`;
-      if (qtdMov > 0) {
-        msg += `\n\nAtenção: existem ${qtdMov} movimentaçõe(s) registradas para este item. Elas NÃO serão apagadas.`;
+      if (!quantidade || quantidade <= 0) {
+        alert('Informe uma quantidade válida.');
+        return;
       }
 
-      const ok = confirm(msg);
-      if (!ok) return;
-
-      try {
-        const refItem = doc(db, "itens_almox", itemSelecionado.id);
-        await deleteDoc(refItem);
-        limparSelecao();
-      } catch (err) {
-        console.error("Erro ao excluir item:", err);
-        alert("Erro ao excluir item. Veja o console para detalhes.");
+      if (!motorista) {
+        alert('Informe o nome do motorista.');
+        return;
       }
-    });
+      if (assinaturaVazia()) {
+        alert('Faça a assinatura do motorista na tela.');
+        return;
+      }
 
-    // ---------- MOVIMENTAÇÕES ----------
-    function formatarDataHora(ts) {
-      if (!ts) return "-";
-      let d;
-      if (ts.toDate) d = ts.toDate();
-      else d = new Date(ts);
-      const dia = String(d.getDate()).padStart(2, "0");
-      const mes = String(d.getMonth() + 1).padStart(2, "0");
-      const ano = d.getFullYear();
-      const hora = String(d.getHours()).padStart(2, "0");
-      const min = String(d.getMinutes()).padStart(2, "0");
-      return `${dia}/${mes}/${ano} ${hora}:${min}`;
-    }
-
-    function renderTabelaMov() {
-      const busca = (movFiltroBusca.value || "").toLowerCase();
-      const tipo = movFiltroTipo.value;
-      const setor = movFiltroSetor.value;
-      const motivo = movFiltroMotivo.value;
-
-      tabelaMov.innerHTML = "";
-
-      let total = 0;
-
-      movCache.forEach((mov) => {
-        let ok = true;
-
-        if (busca) {
-          const texto = (
-            (mov.codigo || "") + " " +
-            (mov.descricao || "") + " " +
-            (mov.responsavel || "")
-          ).toLowerCase();
-          if (!texto.includes(busca)) ok = false;
-        }
-        if (tipo && mov.tipo !== tipo) ok = false;
-        if (setor && mov.setor !== setor) ok = false;
-        if (motivo && mov.motivo !== motivo) ok = false;
-
-        if (!ok) return;
-
-        total++;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${formatarDataHora(mov.dataHora)}</td>
-          <td>${mov.codigo ? mov.codigo + " - " : ""}${mov.descricao || ""}</td>
-          <td>${mov.tipo || ""}</td>
-          <td>${mov.quantidade ?? 0}</td>
-          <td>${mov.setor || ""}</td>
-          <td>${mov.responsavel || ""}</td>
-          <td>${mov.motivo || ""}</td>
-        `;
-
-        const tdAcao = document.createElement("td");
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "Excluir";
-        btnDel.className = "btn btn-danger";
-        btnDel.style.fontSize = "11px";
-        btnDel.addEventListener("click", (e) => {
-          e.stopPropagation();
-          excluirMovimentacao(mov);
-        });
-        tdAcao.appendChild(btnDel);
-        tr.appendChild(tdAcao);
-
-        tabelaMov.appendChild(tr);
+      registros.push({
+        id: Date.now(),
+        data,
+        quantidade,
+        tipo,
+        motorista,
+        assinatura,
+        obs,
+        saldo: 0
       });
 
-      cardTotalMov.textContent = total;
+      salvarStorage();
+      atualizarPainel();
+      renderTabela();
+      limparFormulario(false);
     }
 
-    // Listener movimentações
-    const qMov = query(colMov, orderBy("dataHora", "desc"));
-    onSnapshot(qMov, (snapshot) => {
-      movCache = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      renderTabelaMov();
-    });
-
-    movFiltroBusca.addEventListener("input", renderTabelaMov);
-    movFiltroTipo.addEventListener("change", renderTabelaMov);
-    movFiltroSetor.addEventListener("change", renderTabelaMov);
-    movFiltroMotivo.addEventListener("change", renderTabelaMov);
-
-    // Salvar movimentação
-    formNovaMov.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const textoItem = movItemBusca.value.trim();
-      if (!textoItem) {
-        alert("Selecione um item na lista.");
-        return;
-      }
-
-      const item = itensCache.find(
-        i => `${i.codigo || "S/C"} - ${i.descricao || ""}` === textoItem
-      );
-      if (!item) {
-        alert("Item não encontrado. Escolha um dos itens sugeridos na lista.");
-        return;
-      }
-
-      const itemId = item.id;
-
-      const tipo = movTipo.value;
-      const qtd = Number(movQuantidade.value || 0);
-      if (qtd < 0) {
-        alert("Quantidade inválida.");
-        return;
-      }
-
-      const movSetorVal = movSetor.value || item.setor || "";
-      const responsavel = movResponsavel.value.trim();
-      const motivo = movMotivo.value || "";
-      const obs = movObs.value.trim();
-
-      const movDoc = {
-        itemId: itemId,
-        codigo: item.codigo || "",
-        descricao: item.descricao || "",
-        setor: movSetorVal,
-        tipo: tipo,
-        quantidade: qtd,
-        responsavel: responsavel,
-        motivo: motivo,
-        obs: obs,
-        dataHora: serverTimestamp()
-      };
-
-      try {
-        let novoEstoque = Number(item.estoque || 0);
-        if (tipo === "Entrada") {
-          novoEstoque += qtd;
-        } else if (tipo === "Saída") {
-          novoEstoque -= qtd;
-        } else if (tipo === "Ajuste") {
-          novoEstoque = qtd;
-        }
-
-        if (novoEstoque < 0 && tipo !== "Ajuste") {
-          const cont = confirm("Estoque ficaria negativo. Deseja continuar mesmo assim?");
-          if (!cont) return;
-        }
-
-        const itemRef = doc(db, "itens_almox", itemId);
-        await updateDoc(itemRef, { estoque: novoEstoque });
-
-        await addDoc(colMov, movDoc);
-
-        fecharModalMov();
-      } catch (err) {
-        console.error("Erro ao salvar movimentação:", err);
-        alert("Erro ao salvar movimentação. Veja o console para detalhes.");
-      }
-    });
-
-    // Excluir movimentação (com ajuste de estoque para Entrada/Saída)
-    async function excluirMovimentacao(mov) {
-      const item = itensCache.find(i => i.id === mov.itemId);
-      const msgBase = `Deseja excluir esta movimentação?\n\n${mov.tipo} de ${mov.quantidade} un. do item ${
-        (mov.codigo ? mov.codigo + " - " : "") + (mov.descricao || "")
-      }`;
-      let msg = msgBase;
-
-      if (mov.tipo === "Ajuste") {
-        msg += "\n\nObs: Ajuste NÃO irá alterar o estoque atual ao excluir, para não bagunçar o histórico.";
-      } else {
-        msg += "\n\nO estoque será ajustado automaticamente ao excluir.";
-      }
-
-      const ok = confirm(msg);
-      if (!ok) return;
-
-      try {
-        if (item && mov.tipo !== "Ajuste") {
-          let novoEstoque = Number(item.estoque || 0);
-          const qtd = Number(mov.quantidade || 0);
-
-          if (mov.tipo === "Entrada") {
-            novoEstoque -= qtd; // desfaz entrada
-          } else if (mov.tipo === "Saída") {
-            novoEstoque += qtd; // desfaz saída
-          }
-
-          const itemRef = doc(db, "itens_almox", item.id);
-          await updateDoc(itemRef, { estoque: novoEstoque });
-        }
-
-        const movRef = doc(db, "movimentacoes_almox", mov.id);
-        await deleteDoc(movRef);
-      } catch (err) {
-        console.error("Erro ao excluir movimentação:", err);
-        alert("Erro ao excluir movimentação. Veja o console para detalhes.");
-      }
+    function limparFormulario(resetData = true) {
+      if (resetData) document.getElementById('data').value = hojeISO();
+      document.getElementById('quantidade').value = '';
+      document.getElementById('tipo').value = 'saida';
+      document.getElementById('motorista').value = '';
+      limparAssinatura();
+      document.getElementById('obs').value = '';
     }
 
-    // Início
-    atualizarCabecalhosOrdenacao();
-    setView("itens");
-    limparSelecao();
+    function excluirLancamento(id) {
+      if (!confirm('Deseja realmente excluir este lançamento?')) return;
+      registros = registros.filter(item => item.id !== id);
+      salvarStorage();
+      atualizarPainel();
+      renderTabela();
+    }
+
+    function limparTudo() {
+      if (!confirm('Isso apagará todos os registros. Deseja continuar?')) return;
+      registros = [];
+      salvarStorage();
+      atualizarPainel();
+      renderTabela();
+    }
+
+    function renderTabela() {
+      calcularSaldos();
+      const termo = document.getElementById('busca')?.value.toLowerCase() || '';
+      const tbody = document.getElementById('tabelaLancamentos');
+      const vazio = document.getElementById('estadoVazio');
+
+      const lista = [...registros]
+        .sort((a, b) => new Date(b.data) - new Date(a.data) || b.id - a.id)
+        .filter(item => {
+          const texto = `${item.motorista} ${item.obs}`.toLowerCase();
+          return texto.includes(termo);
+        });
+
+      tbody.innerHTML = '';
+
+      if (!lista.length) {
+        vazio.style.display = 'block';
+        return;
+      }
+
+      vazio.style.display = 'none';
+
+      lista.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatarData(item.data)}</td>
+          <td>${item.quantidade}</td>
+          <td><span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
+          <td><strong>${item.saldo}</strong></td>
+          <td>${item.motorista}</td>
+          <td class="assinatura">${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:150px;max-height:50px;background:#fff;border-radius:6px;padding:4px;">` : '<span class="small">-</span>'}</td>
+          <td>${item.obs || '<span class="small">-</span>'}</td>
+          <td class="no-print"><button class="btn-danger" style="padding:8px 10px;font-size:12px;" onclick="excluirLancamento(${item.id})">Excluir</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportarCSV() {
+      if (!registros.length) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+
+      calcularSaldos();
+      const linhas = [
+        ['Data', 'Quantidade', 'Movimento', 'Saldo', 'Motorista', 'Assinatura', 'Observação'],
+        ...registros.map(r => [
+          formatarData(r.data),
+          r.quantidade,
+          r.tipo,
+          r.saldo,
+          r.motorista,
+          r.assinatura,
+          r.obs || ''
+        ])
+      ];
+
+      const csv = linhas.map(l => l.map(valor => `"${String(valor).replace(/"/g, '""')}"`).join(';')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'controle_pallets.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    atualizarPainel();
+    renderTabela();
   </script>
 </body>
 </html>
