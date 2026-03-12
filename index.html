@@ -58,7 +58,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 340px 1fr;
       gap: 20px;
     }
 
@@ -134,7 +134,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       margin-bottom: 18px;
     }
@@ -164,6 +164,36 @@
       margin-bottom: 14px;
     }
 
+    .mobile-cards {
+      display: none;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .mobile-item {
+      background: #0b1220;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .mobile-item .topo {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .mobile-item .linha {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .mobile-item .linha strong {
+      color: #cbd5e1;
+    }
+
     .toolbar input {
       flex: 1;
       min-width: 220px;
@@ -183,7 +213,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 100%;
       background: #0b1220;
     }
 
@@ -253,10 +283,20 @@
     }
 
     @media (max-width: 640px) {
-      .container { padding: 14px; }
-      .header h1 { font-size: 24px; }
-      .stats { grid-template-columns: 1fr 1fr; }
+      .container { padding: 10px; }
+      .header { padding: 18px; border-radius: 18px; }
+      .header h1 { font-size: 22px; }
+      .header p { font-size: 13px; }
+      .card { padding: 14px; border-radius: 16px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat { padding: 12px; }
+      .stat .value { font-size: 22px; }
       .btn-row { grid-template-columns: 1fr; }
+      .toolbar { flex-direction: column; }
+      .toolbar input { min-width: 100%; }
+      .table-wrap { display: none; }
+      .mobile-cards { display: flex; }
+      #signaturePad { height: 150px !important; }
     }
 
     @media print {
@@ -272,7 +312,7 @@
   <div class="container">
     <div class="header">
       <h1>Controle de Pallets</h1>
-      <p>Ferramenta simples para registrar entrada, saída, saldo e assinatura do motorista.</p>
+      <p>Ferramenta simples para registrar entrada, saída, saldo e assinatura direto na tela, com layout pensado para celular e tablet.</p>
     </div>
 
     <div class="grid">
@@ -298,8 +338,8 @@
         </div>
 
         <div class="field">
-          <label for="motorista">Motorista</label>
-          <input type="text" id="motorista" placeholder="Nome do motorista" />
+          <label for="motorista">Transportadora</label>
+          <input type="text" id="motorista" placeholder="Nome da transportadora" />
         </div>
 
         <div class="field">
@@ -349,9 +389,11 @@
         <div class="card">
           <h2>Histórico</h2>
           <div class="toolbar no-print">
-            <input type="text" id="busca" placeholder="Buscar por motorista, assinatura ou observação..." oninput="renderTabela()" />
+            <input type="text" id="busca" placeholder="Buscar por transportadora ou observação..." oninput="renderTabela()" />
             <button class="btn-success" onclick="window.print()">Imprimir</button>
           </div>
+
+          <div id="mobileCards" class="mobile-cards"></div>
 
           <div class="table-wrap">
             <table>
@@ -361,7 +403,7 @@
                   <th>Quantidade</th>
                   <th>Entrada / Saída</th>
                   <th>Saldo</th>
-                  <th>Motorista</th>
+                  <th>Transportadora</th>
                   <th>Assinatura</th>
                   <th>Observação</th>
                   <th class="no-print">Ações</th>
@@ -537,11 +579,11 @@
       }
 
       if (!motorista) {
-        alert('Informe o nome do motorista.');
+        alert('Informe o nome da transportadora.');
         return;
       }
       if (assinaturaVazia()) {
-        alert('Faça a assinatura do motorista na tela.');
+        alert('Faça a assinatura na tela.');
         return;
       }
 
@@ -550,7 +592,7 @@
         data,
         quantidade,
         tipo,
-        motorista,
+        transportadora: motorista,
         assinatura,
         obs,
         saldo: 0
@@ -591,16 +633,18 @@
       calcularSaldos();
       const termo = document.getElementById('busca')?.value.toLowerCase() || '';
       const tbody = document.getElementById('tabelaLancamentos');
+      const mobileCards = document.getElementById('mobileCards');
       const vazio = document.getElementById('estadoVazio');
 
       const lista = [...registros]
         .sort((a, b) => new Date(b.data) - new Date(a.data) || b.id - a.id)
         .filter(item => {
-          const texto = `${item.motorista} ${item.obs}`.toLowerCase();
+          const texto = `${item.transportadora || item.motorista || ''} ${item.obs}`.toLowerCase();
           return texto.includes(termo);
         });
 
       tbody.innerHTML = '';
+      mobileCards.innerHTML = ''; 
 
       if (!lista.length) {
         vazio.style.display = 'block';
@@ -616,12 +660,28 @@
           <td>${item.quantidade}</td>
           <td><span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
           <td><strong>${item.saldo}</strong></td>
-          <td>${item.motorista}</td>
+          <td>${item.transportadora || item.motorista || '-'}</td>
           <td class="assinatura">${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:150px;max-height:50px;background:#fff;border-radius:6px;padding:4px;">` : '<span class="small">-</span>'}</td>
           <td>${item.obs || '<span class="small">-</span>'}</td>
           <td class="no-print"><button class="btn-danger" style="padding:8px 10px;font-size:12px;" onclick="excluirLancamento(${item.id})">Excluir</button></td>
         `;
         tbody.appendChild(tr);
+
+        const card = document.createElement('div');
+        card.className = 'mobile-item';
+        card.innerHTML = `
+          <div class="topo">
+            <strong>${formatarData(item.data)}</strong>
+            <span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span>
+          </div>
+          <div class="linha"><strong>Transportadora:</strong> ${item.transportadora || item.motorista || '-'}</div>
+          <div class="linha"><strong>Quantidade:</strong> ${item.quantidade}</div>
+          <div class="linha"><strong>Saldo:</strong> ${item.saldo}</div>
+          <div class="linha"><strong>Observação:</strong> ${item.obs || '-'}</div>
+          <div class="linha"><strong>Assinatura:</strong><br>${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:100%;max-height:70px;background:#fff;border-radius:8px;padding:4px;margin-top:6px;">` : '-'}</div>
+          <div style="margin-top:10px;" class="no-print"><button class="btn-danger" style="width:100%;" onclick="excluirLancamento(${item.id})">Excluir</button></div>
+        `;
+        mobileCards.appendChild(card);
       });
     }
 
@@ -639,7 +699,7 @@
           r.quantidade,
           r.tipo,
           r.saldo,
-          r.motorista,
+          r.transportadora || r.motorista || '',
           r.assinatura,
           r.obs || ''
         ])
