@@ -71,16 +71,17 @@
     }
 
     .card {
-      background: rgba(17,24,39,.95);
-      border: 1px solid rgba(255,255,255,.08);
+      background: #ffffff;
+      border: 1px solid #dbeafe;
       border-radius: var(--radius);
       padding: 18px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 10px 24px rgba(14,165,233,.08);
     }
 
     .card h2 {
       margin: 0 0 16px;
       font-size: 20px;
+      color: #0f172a;
     }
 
     .field {
@@ -90,7 +91,7 @@
     .field label {
       display: block;
       margin-bottom: 6px;
-      color: var(--muted);
+      color: #475569;
       font-size: 14px;
       font-weight: 700;
     }
@@ -101,9 +102,9 @@
       width: 100%;
       padding: 12px 14px;
       border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #0f172a;
-      color: var(--white);
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
       outline: none;
       font-size: 15px;
     }
@@ -111,8 +112,8 @@
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+      border-color: var(--primary-strong);
+      box-shadow: 0 0 0 3px rgba(14,165,233,.15);
     }
 
     .btn-row {
@@ -135,9 +136,9 @@
     button:hover { transform: translateY(-1px); }
 
     .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: var(--white); }
-    .btn-secondary { background: #475569; color: var(--white); }
-    .btn-danger { background: var(--red); color: var(--white); }
-    .btn-success { background: var(--green); color: var(--white); }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; }
+    .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; }
     .btn-warning { background: linear-gradient(135deg, #fb923c, var(--accent)); color: #111827; }
 
     .stats {
@@ -201,7 +202,7 @@
     }
 
     .mobile-item .linha strong {
-      color: #cbd5e1;
+      color: #334155;
     }
 
     .saldo-grid {
@@ -241,41 +242,43 @@
       min-width: 220px;
       padding: 11px 14px;
       border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #0f172a;
-      color: var(--white);
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
     }
 
     .table-wrap {
       overflow: auto;
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.08);
+      border: 1px solid #dbeafe;
+      background: #ffffff;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       min-width: 100%;
-      background: #0b1220;
+      background: #ffffff;
     }
 
     th, td {
       padding: 12px 10px;
       text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
+      color: #0f172a;
     }
 
     th {
-      background: #162033;
-      color: #cbd5e1;
+      background: #eff6ff;
+      color: #0f172a;
       position: sticky;
       top: 0;
       z-index: 2;
     }
 
     tr:hover td {
-      background: rgba(255,255,255,.03);
+      background: #f8fafc;
     }
 
     .tag {
@@ -300,7 +303,7 @@
 
     .assinatura {
       font-weight: 700;
-      color: #f8fafc;
+      color: #0f172a;
     }
 
     .small {
@@ -401,7 +404,7 @@
 
         <div class="field">
           <label>Assinatura do motorista</label>
-          <div style="background:#0f172a;border:1px solid var(--line);border-radius:12px;padding:10px;">
+          <div style="background:#f8fafc;border:1px solid #dbeafe;border-radius:12px;padding:10px;">
             <canvas id="signaturePad" style="width:100%;height:180px;background:#ffffff;border-radius:10px;display:block;touch-action:none;"></canvas>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
               <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar assinatura</button>
@@ -427,7 +430,7 @@
         <div class="card" style="margin-bottom:18px;">
           <h2>Consulta por Transportadora</h2>
           <div class="toolbar no-print" style="margin-bottom:0;">
-            <select id="filtroTransportadora" onchange="renderConsultaTransportadora()" style="flex:1;min-width:220px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:#0f172a;color:var(--white);">
+            <select id="filtroTransportadora" onchange="renderConsultaTransportadora()" style="flex:1;min-width:220px;padding:11px 14px;border-radius:12px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;">
               <option value="">Selecione a transportadora para consultar</option>
               <option>SUDOESTE / REUNIDAS</option>
               <option>EUCATUR / BAUER / TRANSGOSS</option>
