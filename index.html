@@ -32,11 +32,13 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      /* Ambiente claro */
+      background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
       color: var(--text);
     }
 
     .container {
+      background: transparent;
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
@@ -694,6 +696,7 @@
         alert('Informe o nome da transportadora.');
         return;
       }
+
       if (assinaturaVazia()) {
         alert('Faça a assinatura na tela.');
         return;
@@ -711,9 +714,16 @@
       });
 
       salvarStorage();
+
+      const filtro = document.getElementById('filtroTransportadora');
+      if (filtro && filtro.value === motorista) {
+        filtro.value = motorista;
+      }
+
       atualizarPainel();
       renderTabela();
-      limparFormulario(false);
+      limparFormulario();
+      mostrarMensagemSalva(`Lançamento salvo com sucesso para ${motorista}.`);
     }
 
     function limparFormulario(resetData = true) {
@@ -721,8 +731,35 @@
       document.getElementById('quantidade').value = '';
       document.getElementById('tipo').value = 'saida';
       document.getElementById('motorista').value = '';
-      limparAssinatura();
       document.getElementById('obs').value = '';
+      limparAssinatura();
+      document.getElementById('quantidade').focus();
+    }
+
+    function mostrarMensagemSalva(texto) {
+      let aviso = document.getElementById('mensagemSalva');
+      if (!aviso) {
+        aviso = document.createElement('div');
+        aviso.id = 'mensagemSalva';
+        aviso.style.position = 'fixed';
+        aviso.style.right = '16px';
+        aviso.style.bottom = '16px';
+        aviso.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
+        aviso.style.color = '#fff';
+        aviso.style.padding = '12px 16px';
+        aviso.style.borderRadius = '14px';
+        aviso.style.boxShadow = '0 10px 25px rgba(0,0,0,.18)';
+        aviso.style.zIndex = '9999';
+        aviso.style.fontWeight = '700';
+        aviso.style.maxWidth = '320px';
+        document.body.appendChild(aviso);
+      }
+      aviso.textContent = texto;
+      aviso.style.display = 'block';
+      clearTimeout(window.__msgSalvaTimeout);
+      window.__msgSalvaTimeout = setTimeout(() => {
+        aviso.style.display = 'none';
+      }, 2200);
     }
 
     function excluirLancamento(id) {
