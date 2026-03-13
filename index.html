@@ -433,8 +433,42 @@
         </div>
 
         <div class="card" style="margin-bottom:18px;">
-          <h2>Saldo por Transportadora</h2>
-          <div id="saldoTransportadoras" class="mobile-cards" style="display:flex;"></div>
+          <h2>Consulta por Transportadora</h2>
+          <div class="toolbar no-print" style="margin-bottom:0;">
+            <select id="filtroTransportadora" onchange="renderConsultaTransportadora()" style="flex:1;min-width:220px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:#0f172a;color:var(--white);">
+              <option value="">Selecione a transportadora para consultar</option>
+              <option>SUDOESTE / REUNIDAS</option>
+              <option>EUCATUR / BAUER / TRANSGOSS</option>
+              <option>SIM / MOBILI / TW</option>
+              <option>EXPRESSO SÃO MIGUEL</option>
+              <option>RODONAVES</option>
+              <option>INTRACARGO</option>
+              <option>ENTREGA GRILAZER</option>
+              <option>COLETA PRÓPRIA</option>
+              <option>TNT</option>
+              <option>ALFA TRANSPORTES</option>
+              <option>GAAM</option>
+              <option>CORREIOS</option>
+            </select>
+          </div>
+          <div class="stats" style="margin-top:14px;margin-bottom:0;">
+            <div class="stat">
+              <div class="label">Saldo da transportadora</div>
+              <div class="value" id="saldoSelecionado">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Entradas da transportadora</div>
+              <div class="value" id="entradasSelecionadas">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Saídas da transportadora</div>
+              <div class="value" id="saidasSelecionadas">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">Lançamentos da transportadora</div>
+              <div class="value" id="totalSelecionado">0</div>
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -610,7 +644,7 @@
       document.getElementById('totalSaidas').textContent = saidas;
       document.getElementById('totalRegistros').textContent = registros.length;
 
-      renderSaldoPorTransportadora();
+      renderConsultaTransportadora();
     }
 
     function calcularSaldoTransportadoras() {
@@ -621,7 +655,7 @@
         .forEach(item => {
           const nome = item.transportadora || item.motorista || 'Sem transportadora';
           if (!mapa[nome]) {
-            mapa[nome] = { nome, saldo: 0, entradas: 0, saidas: 0 };
+            mapa[nome] = { nome, saldo: 0, entradas: 0, saidas: 0, total: 0 };
           }
 
           if (item.tipo === 'entrada') {
@@ -631,29 +665,24 @@
             mapa[nome].saldo -= Number(item.quantidade);
             mapa[nome].saidas += Number(item.quantidade);
           }
+          mapa[nome].total += 1;
         });
 
       return Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
     }
 
-    function renderSaldoPorTransportadora() {
-      const area = document.getElementById('saldoTransportadoras');
-      if (!area) return;
-
+    function renderConsultaTransportadora() {
+      const select = document.getElementById('filtroTransportadora');
+      const nome = select ? select.value : '';
       const saldos = calcularSaldoTransportadoras();
+      const atual = saldos.find(item => item.nome === nome);
 
-      if (!saldos.length) {
-        area.innerHTML = '<div class="empty" style="width:100%;padding:10px 0;">Nenhum saldo por transportadora ainda.</div>';
-        return;
-      }
+      document.getElementById('saldoSelecionado').textContent = atual ? atual.saldo : 0;
+      document.getElementById('entradasSelecionadas').textContent = atual ? atual.entradas : 0;
+      document.getElementById('saidasSelecionadas').textContent = atual ? atual.saidas : 0;
+      document.getElementById('totalSelecionado').textContent = atual ? atual.total : 0;
 
-      area.innerHTML = `<div class="saldo-grid">${saldos.map(item => `
-        <div class="saldo-card">
-          <div class="nome">${item.nome}</div>
-          <div class="numero">${item.saldo}</div>
-          <div class="detalhe">Entradas: ${item.entradas} • Saídas: ${item.saidas}</div>
-        </div>
-      `).join('')}</div>`;
+      renderTabela();
     }
 
     function adicionarLancamento() {
@@ -726,9 +755,9 @@
     }
 
     function renderTabela() {
-      renderSaldoPorTransportadora();
       calcularSaldos();
       const termo = document.getElementById('busca')?.value.toLowerCase() || '';
+      const transportadoraSelecionada = document.getElementById('filtroTransportadora')?.value || ''; 
       const tbody = document.getElementById('tabelaLancamentos');
       const mobileCards = document.getElementById('mobileCards');
       const vazio = document.getElementById('estadoVazio');
@@ -737,7 +766,9 @@
         .sort((a, b) => new Date(b.data) - new Date(a.data) || b.id - a.id)
         .filter(item => {
           const texto = `${item.transportadora || item.motorista || ''} ${item.obs}`.toLowerCase();
-          return texto.includes(termo);
+          const bateBusca = texto.includes(termo);
+          const bateTransportadora = !transportadoraSelecionada || (item.transportadora || item.motorista || '') === transportadoraSelecionada;
+          return bateBusca && bateTransportadora;
         });
 
       tbody.innerHTML = '';
@@ -745,6 +776,8 @@
 
       if (!lista.length) {
         vazio.style.display = 'block';
+        tbody.innerHTML = '';
+        mobileCards.innerHTML = ''; 
         return;
       }
 
@@ -813,7 +846,6 @@
     }
 
     atualizarPainel();
-    renderTabela();
   </script>
 </body>
 </html>
