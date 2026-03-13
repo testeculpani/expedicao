@@ -2,28 +2,25 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Controle de Pallets</title>
   <style>
     :root {
-      /* Novo tema: azul claro + laranja */
-      --bg: #38bdf8;
-      --bg2: #e0f2fe;
+      --bg: #f8fbff;
+      --bg2: #eef7ff;
       --card: #ffffff;
-      --card-2: #f0f9ff;
       --text: #0f172a;
       --muted: #64748b;
+      --line: #dbeafe;
+      --line2: #e2e8f0;
       --primary: #38bdf8;
       --primary-strong: #0ea5e9;
-      --accent: #f97316; /* laranja */
+      --accent: #f97316;
       --accent-strong: #ea580c;
-      --border: #bae6fd;
-      --line: #bae6fd;
       --ok: #16a34a;
-      --warn: #f97316;
       --danger: #ef4444;
-      --white: #ffffff;
-      --shadow: 0 10px 25px rgba(14,165,233,.15);
+      --warn: #f59e0b;
+      --shadow: 0 10px 24px rgba(14, 165, 233, .08);
       --radius: 18px;
     }
 
@@ -32,60 +29,59 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      /* Ambiente claro */
-      background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
       color: var(--text);
     }
 
     .container {
-      background: transparent;
-      max-width: 1200px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 14px;
     }
 
     .header {
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-      border: 1px solid rgba(255,255,255,.5);
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      border: 1px solid #dbeafe;
       border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 14px 34px rgba(14,165,233,.25);
-      margin-bottom: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.06);
+      margin-bottom: 16px;
     }
 
     .header h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
+      margin: 0 0 6px;
+      font-size: 28px;
+      color: #0f172a;
     }
 
     .header p {
       margin: 0;
-      color: #cbd5e1;
-      font-size: 15px;
+      color: #475569;
+      font-size: 14px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
     }
 
     .card {
       background: #ffffff;
       border: 1px solid #dbeafe;
       border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: 0 10px 24px rgba(14,165,233,.08);
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
 
     .card h2 {
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       font-size: 20px;
       color: #0f172a;
     }
 
     .field {
-      margin-bottom: 14px;
+      margin-bottom: 13px;
     }
 
     .field label {
@@ -98,7 +94,9 @@
 
     .field input,
     .field select,
-    .field textarea {
+    .field textarea,
+    .toolbar input,
+    .toolbar select {
       width: 100%;
       padding: 12px 14px;
       border-radius: 12px;
@@ -111,7 +109,9 @@
 
     .field input:focus,
     .field select:focus,
-    .field textarea:focus {
+    .field textarea:focus,
+    .toolbar input:focus,
+    .toolbar select:focus {
       border-color: var(--primary-strong);
       box-shadow: 0 0 0 3px rgba(14,165,233,.15);
     }
@@ -135,17 +135,18 @@
 
     button:hover { transform: translateY(-1px); }
 
-    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: var(--white); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #ffffff; }
     .btn-secondary { background: #e2e8f0; color: #0f172a; }
     .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; }
     .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; }
-    .btn-warning { background: linear-gradient(135deg, #fb923c, var(--accent)); color: #111827; }
+    .btn-warning { background: linear-gradient(135deg, #fdba74, #f97316); color: #111827; }
 
     .stats {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-top: 14px;
+      margin-bottom: 0;
     }
 
     .stat {
@@ -158,13 +159,16 @@
 
     .stat .label {
       font-size: 13px;
-      color: var(--muted);
+      color: #64748b;
       margin-bottom: 8px;
+      font-weight: 700;
     }
 
     .stat .value {
       font-size: 28px;
       font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
     }
 
     .toolbar {
@@ -172,6 +176,78 @@
       gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 14px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid #dbeafe;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 100%;
+      background: #ffffff;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+      color: #0f172a;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #eff6ff;
+      color: #0f172a;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tr:hover td { background: #f8fafc; }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag.entrada {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #16a34a;
+    }
+
+    .tag.saida {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+
+    .assinatura {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px dashed #cbd5e1;
     }
 
     .mobile-cards {
@@ -199,139 +275,53 @@
     .mobile-item .linha {
       margin-bottom: 8px;
       font-size: 14px;
+      color: #0f172a;
     }
 
     .mobile-item .linha strong {
       color: #334155;
     }
 
-    .saldo-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .saldo-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
-    }
-
-    .saldo-card .nome {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .saldo-card .numero {
-      font-size: 26px;
-      font-weight: 800;
-    }
-
-    .saldo-card .detalhe {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .toolbar input {
-      flex: 1;
-      min-width: 220px;
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: #0f172a;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      border-radius: 16px;
-      border: 1px solid #dbeafe;
-      background: #ffffff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 100%;
-      background: #ffffff;
-    }
-
-    th, td {
-      padding: 12px 10px;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 14px;
-      color: #0f172a;
-    }
-
-    th {
-      background: #eff6ff;
-      color: #0f172a;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    tr:hover td {
+    .assinatura-box {
       background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 10px;
     }
 
-    .tag {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
+    .mensagem-salva {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      z-index: 9999;
       font-weight: 700;
+      max-width: 320px;
+      display: none;
     }
 
-    .tag.entrada {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #16a34a;
-      font-weight: 800;
-    }
-
-    .tag.saida {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #ef4444;
-      font-weight: 800;
-    }
-
-    .assinatura {
-      font-weight: 700;
+    .loading-box {
+      padding: 14px;
+      border-radius: 12px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
       color: #0f172a;
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .empty {
-      padding: 24px;
-      text-align: center;
-      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: none;
     }
 
     @media (max-width: 980px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
       .container { padding: 10px; }
-      .header { padding: 18px; border-radius: 18px; }
+      .header { padding: 16px; border-radius: 18px; }
       .header h1 { font-size: 22px; }
       .header p { font-size: 13px; }
       .card { padding: 14px; border-radius: 16px; }
@@ -340,19 +330,18 @@
       .stat .value { font-size: 22px; }
       .btn-row { grid-template-columns: 1fr; }
       .toolbar { flex-direction: column; }
-      .toolbar input { min-width: 100%; }
       .table-wrap { display: none; }
       .mobile-cards { display: flex; }
-      .saldo-grid { grid-template-columns: 1fr; }
       #signaturePad { height: 150px !important; }
     }
 
     @media print {
-      body { background: #fff; color: #000; }
-      .header, .card, .stat, .table-wrap { box-shadow: none; }
-      .no-print { display: none !important; }
-      table { min-width: auto; }
+      body { background: #fff; }
+      .no-print, .mensagem-salva { display: none !important; }
+      .card, .table-wrap { box-shadow: none; }
       th { position: static; }
+      .mobile-cards { display: none !important; }
+      .table-wrap { display: block !important; }
     }
   </style>
 </head>
@@ -360,29 +349,18 @@
   <div class="container">
     <div class="header">
       <h1>Controle de Pallets</h1>
-      <p>Ferramenta simples para registrar entrada, saída, saldo e assinatura direto na tela, com layout pensado para celular e tablet.</p>
+      <p>Consulta por transportadora com entrada, saída, saldo e assinatura direto na tela.</p>
     </div>
 
     <div class="grid">
       <div class="card no-print">
         <h2>Novo Lançamento</h2>
 
+        <div class="loading-box" id="loadingBox">Salvando lançamento...</div>
+
         <div class="field">
           <label for="data">Data</label>
           <input type="date" id="data" />
-        </div>
-
-        <div class="field">
-          <label for="quantidade">Quantidade de pallets</label>
-          <input type="number" id="quantidade" min="1" placeholder="Ex.: 20" />
-        </div>
-
-        <div class="field">
-          <label for="tipo">Movimento</label>
-          <select id="tipo">
-            <option value="saida">Saída</option>
-            <option value="entrada">Entrada</option>
-          </select>
         </div>
 
         <div class="field">
@@ -405,8 +383,21 @@
         </div>
 
         <div class="field">
-          <label>Assinatura do motorista</label>
-          <div style="background:#f8fafc;border:1px solid #dbeafe;border-radius:12px;padding:10px;">
+          <label for="quantidade">Quantidade de pallets</label>
+          <input type="number" id="quantidade" min="1" placeholder="Ex.: 20" />
+        </div>
+
+        <div class="field">
+          <label for="tipo">Movimento</label>
+          <select id="tipo">
+            <option value="saida">Saída</option>
+            <option value="entrada">Entrada</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Assinatura da transportadora</label>
+          <div class="assinatura-box">
             <canvas id="signaturePad" style="width:100%;height:180px;background:#ffffff;border-radius:10px;display:block;touch-action:none;"></canvas>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
               <button type="button" class="btn-secondary" onclick="limparAssinatura()">Limpar assinatura</button>
@@ -423,16 +414,16 @@
         <div class="btn-row">
           <button class="btn-primary" onclick="adicionarLancamento()">Salvar</button>
           <button class="btn-secondary" onclick="limparFormulario()">Limpar</button>
-          <button class="btn-warning" onclick="exportarCSV()">Exportar CSV</button>
-          <button class="btn-danger" onclick="limparTudo()">Apagar Tudo</button>
+          <button class="btn-success" onclick="window.print()">Imprimir</button>
+          <button class="btn-warning" onclick="recarregarDados()">Atualizar</button>
         </div>
       </div>
 
       <div>
-        <div class="card" style="margin-bottom:18px;">
+        <div class="card" style="margin-bottom:16px;">
           <h2>Consulta por Transportadora</h2>
           <div class="toolbar no-print" style="margin-bottom:0;">
-            <select id="filtroTransportadora" onchange="renderConsultaTransportadora()" style="flex:1;min-width:220px;padding:11px 14px;border-radius:12px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;">
+            <select id="filtroTransportadora" onchange="renderConsultaTransportadora()">
               <option value="">Selecione a transportadora para consultar</option>
               <option>SUDOESTE / REUNIDAS</option>
               <option>EUCATUR / BAUER / TRANSGOSS</option>
@@ -448,7 +439,7 @@
               <option>CORREIOS</option>
             </select>
           </div>
-          <div class="stats" style="margin-top:14px;margin-bottom:0;">
+          <div class="stats">
             <div class="stat">
               <div class="label">Saldo da transportadora</div>
               <div class="value" id="saldoSelecionado">0</div>
@@ -471,8 +462,7 @@
         <div class="card">
           <h2>Histórico</h2>
           <div class="toolbar no-print">
-            <input type="text" id="busca" placeholder="Buscar por transportadora ou observação..." oninput="renderTabela()" />
-            <button class="btn-success" onclick="window.print()">Imprimir</button>
+            <input type="text" id="busca" placeholder="Buscar por observação..." oninput="renderTabela()" />
           </div>
 
           <div id="mobileCards" class="mobile-cards"></div>
@@ -484,7 +474,7 @@
                   <th>Data</th>
                   <th>Quantidade</th>
                   <th>Entrada / Saída</th>
-                  <th>Saldo</th>
+                  <th>Saldo da Transportadora</th>
                   <th>Transportadora</th>
                   <th>Assinatura</th>
                   <th>Observação</th>
@@ -494,15 +484,57 @@
               <tbody id="tabelaLancamentos"></tbody>
             </table>
           </div>
-          <div id="estadoVazio" class="empty" style="display:none;">Nenhum lançamento cadastrado ainda.</div>
+
+          <div id="estadoVazio" class="empty" style="display:none;">Nenhum lançamento encontrado.</div>
         </div>
       </div>
     </div>
   </div>
 
+  <div class="mensagem-salva" id="mensagemSalva"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+      query,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBqpiCpHSsAGIk7BaGGoVsqjuxK2cxSPS0",
+      authDomain: "controle-de-pallets-c9a96.firebaseapp.com",
+      projectId: "controle-de-pallets-c9a96",
+      storageBucket: "controle-de-pallets-c9a96.firebasestorage.app",
+      messagingSenderId: "395693671848",
+      appId: "1:395693671848:web:6389316dd6a2490255499d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.firebaseRefs = {
+      db,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+      query,
+      orderBy,
+      onSnapshot
+    };
+  </script>
+
   <script>
-    const STORAGE_KEY = 'controle_pallets_registros';
-    let registros = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let registros = [];
+    let unsubscribeFirebase = null;
     let signaturePad, signatureCtx, desenhando = false;
 
     function hojeISO() {
@@ -514,6 +546,12 @@
 
     document.getElementById('data').value = hojeISO();
 
+    function formatarData(dataISO) {
+      if (!dataISO) return '';
+      const [ano, mes, dia] = dataISO.split('-');
+      return `${dia}/${mes}/${ano}`;
+    }
+
     function ajustarCanvas() {
       signaturePad = document.getElementById('signaturePad');
       if (!signaturePad) return;
@@ -522,6 +560,7 @@
       signaturePad.width = rect.width * ratio;
       signaturePad.height = rect.height * ratio;
       signatureCtx = signaturePad.getContext('2d');
+      signatureCtx.setTransform(1, 0, 0, 1, 0, 0);
       signatureCtx.scale(ratio, ratio);
       signatureCtx.lineWidth = 2.2;
       signatureCtx.lineCap = 'round';
@@ -534,10 +573,7 @@
     function posicaoNoCanvas(event) {
       const rect = signaturePad.getBoundingClientRect();
       const toque = event.touches ? event.touches[0] : event;
-      return {
-        x: toque.clientX - rect.left,
-        y: toque.clientY - rect.top
-      };
+      return { x: toque.clientX - rect.left, y: toque.clientY - rect.top };
     }
 
     function iniciarAssinatura(event) {
@@ -563,25 +599,274 @@
 
     function limparAssinatura() {
       if (!signaturePad || !signatureCtx) return;
-      signatureCtx.clearRect(0, 0, signaturePad.width, signaturePad.height);
       const rect = signaturePad.getBoundingClientRect();
+      signatureCtx.clearRect(0, 0, rect.width, rect.height);
       signatureCtx.fillStyle = '#ffffff';
       signatureCtx.fillRect(0, 0, rect.width, rect.height);
     }
 
     function assinaturaVazia() {
       if (!signaturePad) return true;
+      const rect = signaturePad.getBoundingClientRect();
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = signaturePad.width;
       tempCanvas.height = signaturePad.height;
       const tempCtx = tempCanvas.getContext('2d');
       tempCtx.fillStyle = '#ffffff';
-      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.fillRect(0, 0, rect.width * (window.devicePixelRatio || 1), rect.height * (window.devicePixelRatio || 1));
       return signaturePad.toDataURL() === tempCanvas.toDataURL();
     }
 
     function obterAssinaturaBase64() {
       return signaturePad.toDataURL('image/png');
+    }
+
+    function limparFormulario(resetData = true) {
+      if (resetData) document.getElementById('data').value = hojeISO();
+      document.getElementById('quantidade').value = '';
+      document.getElementById('tipo').value = 'saida';
+      document.getElementById('motorista').value = '';
+      document.getElementById('obs').value = '';
+      limparAssinatura();
+      document.getElementById('quantidade').focus();
+    }
+
+    function mostrarMensagemSalva(texto) {
+      const aviso = document.getElementById('mensagemSalva');
+      aviso.textContent = texto;
+      aviso.style.display = 'block';
+      clearTimeout(window.__msgSalvaTimeout);
+      window.__msgSalvaTimeout = setTimeout(() => {
+        aviso.style.display = 'none';
+      }, 2200);
+    }
+
+    function setLoading(ativo, texto = 'Salvando lançamento...') {
+      const box = document.getElementById('loadingBox');
+      box.textContent = texto;
+      box.style.display = ativo ? 'block' : 'none';
+    }
+
+    function calcularSaldoTransportadoras() {
+      const mapa = {};
+      const ordenados = [...registros].sort((a, b) => {
+        const da = (a.data || '').localeCompare(b.data || '');
+        if (da !== 0) return da;
+        return String(a.id).localeCompare(String(b.id));
+      });
+
+      ordenados.forEach(item => {
+        const nome = item.transportadora || 'Sem transportadora';
+        if (!mapa[nome]) mapa[nome] = { nome, saldo: 0, entradas: 0, saidas: 0, total: 0 };
+
+        if (item.tipo === 'entrada') {
+          mapa[nome].saldo += Number(item.quantidade || 0);
+          mapa[nome].entradas += Number(item.quantidade || 0);
+        } else {
+          mapa[nome].saldo -= Number(item.quantidade || 0);
+          mapa[nome].saidas += Number(item.quantidade || 0);
+        }
+
+        mapa[nome].total += 1;
+      });
+
+      return Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    }
+
+    function calcularSaldoLinhaTransportadora(item) {
+      const nome = item.transportadora || '';
+      const ordenados = [...registros].sort((a, b) => {
+        const da = (a.data || '').localeCompare(b.data || '');
+        if (da !== 0) return da;
+        return String(a.id).localeCompare(String(b.id));
+      });
+
+      let saldo = 0;
+      for (const reg of ordenados) {
+        if ((reg.transportadora || '') === nome) {
+          saldo += reg.tipo === 'entrada' ? Number(reg.quantidade || 0) : -Number(reg.quantidade || 0);
+        }
+        if (reg.id === item.id) return saldo;
+      }
+      return 0;
+    }
+
+    function renderConsultaTransportadora() {
+      const select = document.getElementById('filtroTransportadora');
+      const nome = select ? select.value : '';
+      const saldos = calcularSaldoTransportadoras();
+      const atual = saldos.find(item => item.nome === nome);
+
+      document.getElementById('saldoSelecionado').textContent = atual ? atual.saldo : 0;
+      document.getElementById('entradasSelecionadas').textContent = atual ? atual.entradas : 0;
+      document.getElementById('saidasSelecionadas').textContent = atual ? atual.saidas : 0;
+      document.getElementById('totalSelecionado').textContent = atual ? atual.total : 0;
+
+      renderTabela();
+    }
+
+    function renderTabela() {
+      const termo = document.getElementById('busca')?.value.toLowerCase() || '';
+      const transportadoraSelecionada = document.getElementById('filtroTransportadora')?.value || '';
+      const tbody = document.getElementById('tabelaLancamentos');
+      const mobileCards = document.getElementById('mobileCards');
+      const vazio = document.getElementById('estadoVazio');
+
+      tbody.innerHTML = '';
+      mobileCards.innerHTML = '';
+
+      const lista = [...registros]
+        .sort((a, b) => {
+          const da = (b.data || '').localeCompare(a.data || '');
+          if (da !== 0) return da;
+          return String(b.id).localeCompare(String(a.id));
+        })
+        .filter(item => {
+          const texto = `${item.transportadora || ''} ${item.obs || ''}`.toLowerCase();
+          const bateBusca = texto.includes(termo);
+          const bateTransportadora = !transportadoraSelecionada || (item.transportadora || '') === transportadoraSelecionada;
+          return bateBusca && bateTransportadora;
+        });
+
+      if (!lista.length) {
+        vazio.style.display = 'block';
+        return;
+      }
+
+      vazio.style.display = 'none';
+
+      lista.forEach(item => {
+        const saldoLinha = calcularSaldoLinhaTransportadora(item);
+        const assinaturaHtml = item.assinatura
+          ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:150px;max-height:50px;background:#fff;border-radius:6px;padding:4px;border:1px solid #e2e8f0;">`
+          : '<span class="small">-</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatarData(item.data)}</td>
+          <td>${item.quantidade}</td>
+          <td><span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
+          <td><strong>${saldoLinha}</strong></td>
+          <td>${item.transportadora || '-'}</td>
+          <td class="assinatura">${assinaturaHtml}</td>
+          <td>${item.obs || '<span class="small">-</span>'}</td>
+          <td class="no-print"><button class="btn-danger" style="padding:8px 10px;font-size:12px;" onclick="excluirLancamento('${item.id}')">Excluir</button></td>
+        `;
+        tbody.appendChild(tr);
+
+        const card = document.createElement('div');
+        card.className = 'mobile-item';
+        card.innerHTML = `
+          <div class="topo">
+            <strong>${formatarData(item.data)}</strong>
+            <span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span>
+          </div>
+          <div class="linha"><strong>Transportadora:</strong> ${item.transportadora || '-'}</div>
+          <div class="linha"><strong>Quantidade:</strong> ${item.quantidade}</div>
+          <div class="linha"><strong>Saldo:</strong> ${saldoLinha}</div>
+          <div class="linha"><strong>Observação:</strong> ${item.obs || '-'}</div>
+          <div class="linha"><strong>Assinatura:</strong><br>${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:100%;max-height:70px;background:#fff;border-radius:8px;padding:4px;border:1px solid #e2e8f0;margin-top:6px;">` : '-'}</div>
+          <div style="margin-top:10px;" class="no-print"><button class="btn-danger" style="width:100%;" onclick="excluirLancamento('${item.id}')">Excluir</button></div>
+        `;
+        mobileCards.appendChild(card);
+      });
+    }
+
+    async function adicionarLancamento() {
+      const data = document.getElementById('data').value;
+      const quantidade = Number(document.getElementById('quantidade').value);
+      const tipo = document.getElementById('tipo').value;
+      const transportadora = document.getElementById('motorista').value;
+      const assinatura = obterAssinaturaBase64();
+      const obs = document.getElementById('obs').value.trim();
+
+      if (!data) {
+        alert('Preencha a data.');
+        return;
+      }
+
+      if (!quantidade || quantidade <= 0) {
+        alert('Informe uma quantidade válida.');
+        return;
+      }
+
+      if (!transportadora) {
+        alert('Selecione a transportadora.');
+        return;
+      }
+
+      if (assinaturaVazia()) {
+        alert('Faça a assinatura na tela.');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const { db, collection, addDoc, serverTimestamp } = window.firebaseRefs;
+
+        await addDoc(collection(db, 'lancamentosPallets'), {
+          data,
+          quantidade,
+          tipo,
+          transportadora,
+          obs,
+          assinatura,
+          criadoEm: serverTimestamp()
+        });
+
+        mostrarMensagemSalva(`Lançamento salvo com sucesso para ${transportadora}.`);
+        limparFormulario();
+
+        const filtro = document.getElementById('filtroTransportadora');
+        if (filtro && filtro.value === transportadora) {
+          renderConsultaTransportadora();
+        }
+      } catch (erro) {
+        console.error('Erro ao salvar no Firestore:', erro);
+        alert('Erro ao salvar no Firebase. Verifique as regras do Firestore e a conexão.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function excluirLancamento(id) {
+      if (!confirm('Deseja realmente excluir este lançamento?')) return;
+
+      try {
+        const { db, deleteDoc, doc } = window.firebaseRefs;
+        await deleteDoc(doc(db, 'lancamentosPallets', id));
+        mostrarMensagemSalva('Lançamento excluído com sucesso.');
+      } catch (erro) {
+        console.error('Erro ao excluir:', erro);
+        alert('Erro ao excluir lançamento.');
+      }
+    }
+
+    function iniciarFirebase() {
+      try {
+        const { db, collection, query, orderBy, onSnapshot } = window.firebaseRefs;
+        const q = query(collection(db, 'lancamentosPallets'), orderBy('data', 'asc'));
+
+        unsubscribeFirebase = onSnapshot(q, (snapshot) => {
+          registros = snapshot.docs.map(item => ({
+            id: item.id,
+            ...item.data()
+          }));
+
+          renderConsultaTransportadora();
+        }, (erro) => {
+          console.error('Erro ao carregar dados:', erro);
+          alert('Erro ao carregar dados do Firebase.');
+        });
+      } catch (erro) {
+        console.error('Erro ao iniciar Firebase:', erro);
+      }
+    }
+
+    function recarregarDados() {
+      if (unsubscribeFirebase) unsubscribeFirebase();
+      iniciarFirebase();
+      mostrarMensagemSalva('Dados atualizados.');
     }
 
     window.addEventListener('resize', () => {
@@ -605,279 +890,8 @@
       signaturePad.addEventListener('touchstart', iniciarAssinatura, { passive: false });
       signaturePad.addEventListener('touchmove', desenharAssinatura, { passive: false });
       window.addEventListener('touchend', finalizarAssinatura);
+      iniciarFirebase();
     });
-
-    function salvarStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-    }
-
-    function formatarData(dataISO) {
-      if (!dataISO) return '';
-      const [ano, mes, dia] = dataISO.split('-');
-      return `${dia}/${mes}/${ano}`;
-    }
-
-    function calcularSaldos() {
-      let saldo = 0;
-      registros.sort((a, b) => new Date(a.data) - new Date(b.data) || a.id - b.id);
-      registros.forEach(item => {
-        if (item.tipo === 'entrada') {
-          saldo += Number(item.quantidade);
-        } else {
-          saldo -= Number(item.quantidade);
-        }
-        item.saldo = saldo;
-      });
-    }
-
-    function atualizarPainel() {
-      calcularSaldos();
-      const entradas = registros.filter(r => r.tipo === 'entrada').reduce((acc, r) => acc + Number(r.quantidade), 0);
-      const saidas = registros.filter(r => r.tipo === 'saida').reduce((acc, r) => acc + Number(r.quantidade), 0);
-      const saldo = registros.length ? registros[registros.length - 1].saldo : 0;
-
-      document.getElementById('saldoAtual').textContent = saldo;
-      document.getElementById('totalEntradas').textContent = entradas;
-      document.getElementById('totalSaidas').textContent = saidas;
-      document.getElementById('totalRegistros').textContent = registros.length;
-
-      renderConsultaTransportadora();
-    }
-
-    function calcularSaldoTransportadoras() {
-      const mapa = {};
-
-      [...registros]
-        .sort((a, b) => new Date(a.data) - new Date(b.data) || a.id - b.id)
-        .forEach(item => {
-          const nome = item.transportadora || item.motorista || 'Sem transportadora';
-          if (!mapa[nome]) {
-            mapa[nome] = { nome, saldo: 0, entradas: 0, saidas: 0, total: 0 };
-          }
-
-          if (item.tipo === 'entrada') {
-            mapa[nome].saldo += Number(item.quantidade);
-            mapa[nome].entradas += Number(item.quantidade);
-          } else {
-            mapa[nome].saldo -= Number(item.quantidade);
-            mapa[nome].saidas += Number(item.quantidade);
-          }
-          mapa[nome].total += 1;
-        });
-
-      return Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-    }
-
-    function renderConsultaTransportadora() {
-      const select = document.getElementById('filtroTransportadora');
-      const nome = select ? select.value : '';
-      const saldos = calcularSaldoTransportadoras();
-      const atual = saldos.find(item => item.nome === nome);
-
-      document.getElementById('saldoSelecionado').textContent = atual ? atual.saldo : 0;
-      document.getElementById('entradasSelecionadas').textContent = atual ? atual.entradas : 0;
-      document.getElementById('saidasSelecionadas').textContent = atual ? atual.saidas : 0;
-      document.getElementById('totalSelecionado').textContent = atual ? atual.total : 0;
-
-      renderTabela();
-    }
-
-    function adicionarLancamento() {
-      const data = document.getElementById('data').value;
-      const quantidade = Number(document.getElementById('quantidade').value);
-      const tipo = document.getElementById('tipo').value;
-      const motorista = document.getElementById('motorista').value.trim();
-      const assinatura = obterAssinaturaBase64();
-      const obs = document.getElementById('obs').value.trim();
-
-      if (!data) {
-        alert('Preencha a data.');
-        return;
-      }
-
-      if (!quantidade || quantidade <= 0) {
-        alert('Informe uma quantidade válida.');
-        return;
-      }
-
-      if (!motorista) {
-        alert('Informe o nome da transportadora.');
-        return;
-      }
-
-      if (assinaturaVazia()) {
-        alert('Faça a assinatura na tela.');
-        return;
-      }
-
-      registros.push({
-        id: Date.now(),
-        data,
-        quantidade,
-        tipo,
-        transportadora: motorista,
-        assinatura,
-        obs,
-        saldo: 0
-      });
-
-      salvarStorage();
-
-      const filtro = document.getElementById('filtroTransportadora');
-      if (filtro && filtro.value === motorista) {
-        filtro.value = motorista;
-      }
-
-      atualizarPainel();
-      renderTabela();
-      limparFormulario();
-      mostrarMensagemSalva(`Lançamento salvo com sucesso para ${motorista}.`);
-    }
-
-    function limparFormulario(resetData = true) {
-      if (resetData) document.getElementById('data').value = hojeISO();
-      document.getElementById('quantidade').value = '';
-      document.getElementById('tipo').value = 'saida';
-      document.getElementById('motorista').value = '';
-      document.getElementById('obs').value = '';
-      limparAssinatura();
-      document.getElementById('quantidade').focus();
-    }
-
-    function mostrarMensagemSalva(texto) {
-      let aviso = document.getElementById('mensagemSalva');
-      if (!aviso) {
-        aviso = document.createElement('div');
-        aviso.id = 'mensagemSalva';
-        aviso.style.position = 'fixed';
-        aviso.style.right = '16px';
-        aviso.style.bottom = '16px';
-        aviso.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
-        aviso.style.color = '#fff';
-        aviso.style.padding = '12px 16px';
-        aviso.style.borderRadius = '14px';
-        aviso.style.boxShadow = '0 10px 25px rgba(0,0,0,.18)';
-        aviso.style.zIndex = '9999';
-        aviso.style.fontWeight = '700';
-        aviso.style.maxWidth = '320px';
-        document.body.appendChild(aviso);
-      }
-      aviso.textContent = texto;
-      aviso.style.display = 'block';
-      clearTimeout(window.__msgSalvaTimeout);
-      window.__msgSalvaTimeout = setTimeout(() => {
-        aviso.style.display = 'none';
-      }, 2200);
-    }
-
-    function excluirLancamento(id) {
-      if (!confirm('Deseja realmente excluir este lançamento?')) return;
-      registros = registros.filter(item => item.id !== id);
-      salvarStorage();
-      atualizarPainel();
-      renderTabela();
-    }
-
-    function limparTudo() {
-      if (!confirm('Isso apagará todos os registros. Deseja continuar?')) return;
-      registros = [];
-      salvarStorage();
-      atualizarPainel();
-      renderTabela();
-    }
-
-    function renderTabela() {
-      calcularSaldos();
-      const termo = document.getElementById('busca')?.value.toLowerCase() || '';
-      const transportadoraSelecionada = document.getElementById('filtroTransportadora')?.value || ''; 
-      const tbody = document.getElementById('tabelaLancamentos');
-      const mobileCards = document.getElementById('mobileCards');
-      const vazio = document.getElementById('estadoVazio');
-
-      const lista = [...registros]
-        .sort((a, b) => new Date(b.data) - new Date(a.data) || b.id - a.id)
-        .filter(item => {
-          const texto = `${item.transportadora || item.motorista || ''} ${item.obs}`.toLowerCase();
-          const bateBusca = texto.includes(termo);
-          const bateTransportadora = !transportadoraSelecionada || (item.transportadora || item.motorista || '') === transportadoraSelecionada;
-          return bateBusca && bateTransportadora;
-        });
-
-      tbody.innerHTML = '';
-      mobileCards.innerHTML = ''; 
-
-      if (!lista.length) {
-        vazio.style.display = 'block';
-        tbody.innerHTML = '';
-        mobileCards.innerHTML = ''; 
-        return;
-      }
-
-      vazio.style.display = 'none';
-
-      lista.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${formatarData(item.data)}</td>
-          <td>${item.quantidade}</td>
-          <td><span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
-          <td><strong>${item.saldo}</strong></td>
-          <td>${item.transportadora || item.motorista || '-'}</td>
-          <td class="assinatura">${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:150px;max-height:50px;background:#fff;border-radius:6px;padding:4px;">` : '<span class="small">-</span>'}</td>
-          <td>${item.obs || '<span class="small">-</span>'}</td>
-          <td class="no-print"><button class="btn-danger" style="padding:8px 10px;font-size:12px;" onclick="excluirLancamento(${item.id})">Excluir</button></td>
-        `;
-        tbody.appendChild(tr);
-
-        const card = document.createElement('div');
-        card.className = 'mobile-item';
-        card.innerHTML = `
-          <div class="topo">
-            <strong>${formatarData(item.data)}</strong>
-            <span class="tag ${item.tipo}">${item.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span>
-          </div>
-          <div class="linha"><strong>Transportadora:</strong> ${item.transportadora || item.motorista || '-'}</div>
-          <div class="linha"><strong>Quantidade:</strong> ${item.quantidade}</div>
-          <div class="linha"><strong>Saldo:</strong> ${item.saldo}</div>
-          <div class="linha"><strong>Observação:</strong> ${item.obs || '-'}</div>
-          <div class="linha"><strong>Assinatura:</strong><br>${item.assinatura ? `<img src="${item.assinatura}" alt="Assinatura" style="max-width:100%;max-height:70px;background:#fff;border-radius:8px;padding:4px;margin-top:6px;">` : '-'}</div>
-          <div style="margin-top:10px;" class="no-print"><button class="btn-danger" style="width:100%;" onclick="excluirLancamento(${item.id})">Excluir</button></div>
-        `;
-        mobileCards.appendChild(card);
-      });
-    }
-
-    function exportarCSV() {
-      if (!registros.length) {
-        alert('Não há dados para exportar.');
-        return;
-      }
-
-      calcularSaldos();
-      const linhas = [
-        ['Data', 'Quantidade', 'Movimento', 'Saldo Geral', 'Transportadora', 'Assinatura', 'Observação'],
-        ...registros.map(r => [
-          formatarData(r.data),
-          r.quantidade,
-          r.tipo,
-          r.saldo,
-          r.transportadora || r.motorista || '',
-          r.assinatura,
-          r.obs || ''
-        ])
-      ];
-
-      const csv = linhas.map(l => l.map(valor => `"${String(valor).replace(/"/g, '""')}"`).join(';')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'controle_pallets.csv';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    atualizarPainel();
   </script>
 </body>
 </html>
